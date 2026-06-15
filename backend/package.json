@@ -1,0 +1,20 @@
+{
+  "name": "fuliya-website",
+  "version": "1.0.0",
+  "description": "广州富丽雅实业有限公司官网",
+  "main": "app.js",
+  "scripts": {
+    "start": "node app.js",
+    "dev": "node app.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "mysql2": "^3.6.0",
+    "multer": "^1.4.5-lts.1",
+    "sharp": "^0.33.1",
+    "cors": "^2.8.5",
+    "jsonwebtoken": "^9.0.2",
+    "bcryptjs": "^2.4.3",
+    "moment": "^2.29.4"
+  }
+}
