@@ -1,0 +1,41 @@
+<footer class="footer py-16 px-4">
+  <div class="max-w-6xl mx-auto">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10">
+      <div class="footer-section">
+        <h4><%= lang==='zh' ? '关于富丽雅' : 'About Fuliya' %></h4>
+        <p class="text-sm leading-relaxed text-gray-400">
+          <%= lang==='zh' ? '16 年专注环保包袋 OEM/ODM 定制，产品远销全球 50+ 国家。' : '16 years专注 eco bag OEM/ODM, exported to 50+ countries.' %>
+        </p>
+      </div>
+      <div class="footer-section">
+        <h4><%= lang==='zh' ? '快速链接' : 'Quick Links' %></h4>
+        <ul class="space-y-3 text-sm">
+          <li><a href="/"><%= lang==='zh' ? '首页' : 'Home' %></a></li>
+          <li><a href="/products"><%= lang==='zh' ? '产品中心' : 'Products' %></a></li>
+          <li><a href="/about"><%= lang==='zh' ? '关于我们' : 'About' %></a></li>
+          <li><a href="/contact"><%= lang==='zh' ? '联系我们' : 'Contact' %></a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4><%= lang==='zh' ? '产品分类' : 'Products' %></h4>
+        <ul class="space-y-3 text-sm">
+          <li><a href="/products?category_id=1"><%= lang==='zh' ? '环保购物袋' : 'Eco Shopping Bags' %></a></li>
+          <li><a href="/products?category_id=2"><%= lang==='zh' ? '棉布帆布袋' : 'Cotton Canvas Bags' %></a></li>
+          <li><a href="/products?category_id=3"><%= lang==='zh' ? '宠物包系列' : 'Pet Bags' %></a></li>
+        </ul>
+      </div>
+      <div class="footer-section">
+        <h4><%= lang==='zh' ? '联系我们' : 'Contact' %></h4>
+        <ul class="space-y-3 text-sm text-gray-400">
+          <li>📞 <%= config?.phone || '+86-20-12345678' %></li>
+          <li>✉️ <%= config?.email || 'info@fuliya.com' %></li>
+          <li>📍 <%= config?.company_address || (lang==='zh' ? '广州市白云区' : 'Guangzhou, China') %></li>
+        </ul>
+      </div>
+    </div>
+    <div class="border-t border-slate-800 mt-10 pt-8 flex flex-col sm:flex-row items-center justify-between text-sm text-slate-500">
+      <p><%= config?.copyright || '© 2026 广州富丽雅实业有限公司' %></p>
+      <p class="mt-2 sm:mt-0"><%= config?.icp || '粤ICP备XXXXXXXX号' %></p>
+    </div>
+  </div>
+</footer>

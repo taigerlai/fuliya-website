@@ -1,0 +1,10 @@
+<%- include('../partials/header', { config, lang, path: '/cases' }) %>
+<div class="banner-placeholder banner-placeholder-sm"><div class="relative z-10 text-center px-4"><h1 class="text-3xl md:text-4xl font-bold text-white"><%= lang==='zh' ? '客户案例' : 'Our Cases' %></h1></div></div>
+<div class="max-w-6xl mx-auto px-4 py-16">
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <% if (cases && cases.length) { cases.forEach(c => { %>
+    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden"><div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200"></div><div class="p-5"><h3 class="font-semibold"><%= lang==='zh' ? c.title_zh : c.title_en %></h3><p class="text-sm text-gray-500 mt-1"><%= c.client_name %></p></div></div>
+    <% }) } else { %><p class="col-span-3 text-center text-gray-400 py-10"><%= lang==='zh' ? '暂无案例' : 'No cases yet' %></p><% } %>
+  </div>
+</div>
+<%- include('../partials/footer', { config, lang }) %>

@@ -1,0 +1,11 @@
+<%- include('../partials/header', { config, lang, path: '/about' }) %>
+<div class="banner-placeholder banner-placeholder-sm"><div class="relative z-10 text-center px-4"><h1 class="text-3xl md:text-4xl font-bold text-white"><%= lang==='zh' ? '关于富丽雅' : 'About Us' %></h1></div></div>
+<div class="max-w-6xl mx-auto px-4 pt-6"><nav class="text-sm text-gray-500 flex items-center gap-2"><a href="/" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '首页' : 'Home' %></a><span>/</span><span class="font-medium"><%= lang==='zh' ? '关于我们' : 'About Us' %></span></nav></div>
+<section class="max-w-6xl mx-auto px-4 py-12">
+  <div class="text-center mb-2"><span class="text-[#2ab39f] font-semibold text-sm tracking-widest uppercase">ABOUT US</span><h2 class="text-3xl font-bold mt-2"><%= lang==='zh' ? '关于富丽雅' : 'About Fuliya' %></h2></div>
+  <div class="flex flex-col lg:flex-row items-center gap-12 mt-8">
+    <div class="lg:w-1/2"><div class="h-80 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400"><%= lang==='zh' ? '公司形象图' : 'Company Image' %></div></div>
+    <div class="lg:w-1/2"><h3 class="text-xl font-bold mb-4"><%= lang==='zh' ? '16 年专注环保包袋定制' : '16 Years of Excellence' %></h3><p class="text-gray-600 leading-relaxed mb-4"><%= lang==='zh' ? '广州富丽雅实业有限公司，成立于 2010 年，坐落于广州市白云区，是一家集研发设计、生产制造、国际贸易于一体的环保包袋 OEM/ODM 工贸企业。' : 'Guangzhou Fuliya Industry Co., Ltd., founded in 2010, is a professional eco-bag OEM/ODM manufacturer integrating R&D, production and trade.' %></p></div>
+  </div>
+</section>
+<%- include('../partials/footer', { config, lang }) %>

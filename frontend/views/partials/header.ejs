@@ -1,0 +1,53 @@
+<!-- Top Header: Logo + Search + Phone -->
+<div class="top-header">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between py-5">
+      <a href="/" class="flex items-center gap-3 flex-shrink-0">
+        <div class="w-14 h-14 rounded-2xl bg-[#2ab39f] flex items-center justify-center text-white font-bold text-xl">富</div>
+        <div>
+          <div class="logo-text font-bold text-2xl tracking-wide text-white"><%= lang==='zh' ? '富丽雅实业' : 'Fuliya Industry' %></div>
+          <div class="text-xs text-slate-400 tracking-widest">GUANGZHOU FULIYA INDUSTRY CO., LTD.</div>
+        </div>
+      </a>
+      <div class="hidden md:block flex-1 max-w-md mx-8">
+        <div class="relative">
+          <form action="/products" method="GET">
+            <input type="text" name="search" placeholder="<%= lang==='zh' ? '搜索产品、关键词...' : 'Search products...' %>" class="w-full py-2.5 pl-10 pr-4 rounded-lg text-sm bg-white/10 border border-white/20 text-white placeholder:text-white/40 focus:outline-none focus:border-[#2ab39f] focus:bg-white/15">
+            <button type="submit" class="absolute left-3 top-1/2 -translate-y-1/2"><svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
+          </form>
+        </div>
+      </div>
+      <div class="flex items-center gap-2 flex-shrink-0">
+        <div class="w-9 h-9 rounded-lg bg-[#2ab39f]/20 flex items-center justify-center">
+          <svg class="w-4 h-4 text-[#2ab39f]" fill="currentColor" viewBox="0 0 20 20"><path d="M2 3a1 1 0 011-1h2.153a1 1 0 01.986.836l.74 4.435a1 1 0 01-.54 1.06l-1.548.773a11.037 11.037 0 006.105 6.105l.774-1.548a1 1 0 011.059-.54l4.435.74a1 1 0 01.836.986V17a1 1 0 01-1 1h-2C7.82 18 2 12.18 2 5V3z"/></svg>
+        </div>
+        <div>
+          <div class="text-xs text-slate-400"><%= lang==='zh' ? '服务热线' : 'Hotline' %></div>
+          <a href="tel:<%= config?.phone || '+86-20-12345678' %>" class="text-sm font-medium text-white hover:text-[#2ab39f] transition"><%= config?.phone || '+86-20-12345678' %></a>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Navigation -->
+<nav class="nav-bar">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex items-center justify-between h-14">
+      <div class="hidden lg:flex items-center gap-8">
+        <a href="/" class="nav-link<%= path==='/' ? ' active' : '' %>"><%= lang==='zh' ? '首页' : 'Home' %></a>
+        <a href="/products" class="nav-link<%= path.startsWith('/products') ? ' active' : '' %>"><%= lang==='zh' ? '产品中心' : 'Products' %></a>
+        <a href="/strength" class="nav-link<%= path==='/strength' ? ' active' : '' %>"><%= lang==='zh' ? '企业实力' : 'Strength' %></a>
+        <a href="/cases" class="nav-link<%= path==='/cases' ? ' active' : '' %>"><%= lang==='zh' ? '客户案例' : 'Cases' %></a>
+        <a href="/news" class="nav-link<%= path==='/news' ? ' active' : '' %>"><%= lang==='zh' ? '新闻中心' : 'News' %></a>
+        <a href="/about" class="nav-link<%= path==='/about' ? ' active' : '' %>"><%= lang==='zh' ? '关于我们' : 'About' %></a>
+        <a href="/contact" class="nav-link<%= path==='/contact' ? ' active' : '' %>"><%= lang==='zh' ? '联系我们' : 'Contact' %></a>
+      </div>
+      <div class="hidden lg:flex items-center gap-1 text-xs border border-gray-200 rounded px-2.5 py-1.5 ml-auto">
+        <a href="?lang=zh" class="<%= lang==='zh' ? 'text-[#2ab39f] font-semibold' : 'text-gray-400' %> cursor-pointer">中</a>
+        <span class="text-gray-300">|</span>
+        <a href="?lang=en" class="<%= lang==='en' ? 'text-[#2ab39f] font-semibold' : 'text-gray-400' %> cursor-pointer">EN</a>
+      </div>
+    </div>
+  </div>
+</nav>

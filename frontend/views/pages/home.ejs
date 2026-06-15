@@ -1,0 +1,75 @@
+<%- include('../partials/header', { config, lang, path: '/' }) %>
+
+<!-- Banner -->
+<section class="banner-placeholder">
+  <div class="relative z-10 text-center px-4">
+    <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold max-w-4xl mx-auto leading-tight text-white">
+      <%= lang==='zh' ? '环保袋・宠物包・旅行包<br>OEM/ODM 定制工厂' : 'Eco Bags, Pet Bags, Travel Bags<br>OEM/ODM Factory' %>
+    </h1>
+    <p class="text-lg md:text-xl text-gray-300 mt-4 max-w-2xl mx-auto">
+      <%= lang==='zh' ? '广州富丽雅实业有限公司 · 16 年工贸一体' : 'Guangzhou Fuliya Industry · 16 Years OEM/ODM' %>
+    </p>
+    <div class="flex items-center justify-center gap-4 mt-8">
+      <a href="/products" class="bg-[#2ab39f] hover:bg-[#1f8e7d] text-white px-8 py-3 rounded-lg font-semibold transition"><%= lang==='zh' ? '浏览产品' : 'View Products' %></a>
+      <a href="/contact" class="border-2 border-white/40 text-white px-8 py-3 rounded-lg font-semibold hover:bg-white/10 transition"><%= lang==='zh' ? '联系我们' : 'Contact Us' %></a>
+    </div>
+  </div>
+</section>
+
+<!-- Advantages -->
+<section class="py-20 px-4">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="section-title"><%= lang==='zh' ? '四大核心优势' : 'Why Choose Us' %></h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mt-12">
+      <div class="text-center p-6 rounded-xl bg-white border border-gray-100 hover:shadow-lg transition">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-[#e6f7f4] flex items-center justify-center mb-4"><svg class="w-8 h-8 text-[#2ab39f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div>
+        <h3 class="font-semibold text-lg mb-2"><%= lang==='zh' ? '16 年行业经验' : '16 Years Exp' %></h3>
+      </div>
+      <div class="text-center p-6 rounded-xl bg-white border border-gray-100 hover:shadow-lg transition">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-[#e6f7f4] flex items-center justify-center mb-4"><svg class="w-8 h-8 text-[#2ab39f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div>
+        <h3 class="font-semibold text-lg mb-2"><%= lang==='zh' ? '快速打样' : 'Fast Sampling' %></h3>
+      </div>
+      <div class="text-center p-6 rounded-xl bg-white border border-gray-100 hover:shadow-lg transition">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-[#e6f7f4] flex items-center justify-center mb-4"><svg class="w-8 h-8 text-[#2ab39f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/></svg></div>
+        <h3 class="font-semibold text-lg mb-2"><%= lang==='zh' ? '严格品控' : 'Strict QC' %></h3>
+      </div>
+      <div class="text-center p-6 rounded-xl bg-white border border-gray-100 hover:shadow-lg transition">
+        <div class="w-16 h-16 mx-auto rounded-2xl bg-[#e6f7f4] flex items-center justify-center mb-4"><svg class="w-8 h-8 text-[#2ab39f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div>
+        <h3 class="font-semibold text-lg mb-2"><%= lang==='zh' ? '全球交付' : 'Global Delivery' %></h3>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products -->
+<section class="py-20 px-4 bg-gray-50">
+  <div class="max-w-6xl mx-auto">
+    <h2 class="section-title"><%= lang==='zh' ? '热门产品' : 'Featured Products' %></h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mt-10">
+      <% if (products && products.length) { %>
+        <% products.forEach(p => { %>
+          <a href="/products/<%= p.slug %>" class="product-card">
+            <div class="h-48 bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm"><%= lang==='zh' ? '产品图片' : 'Product Image' %></div>
+            <div class="p-4">
+              <h3 class="font-semibold"><%= lang==='zh' ? p.title_zh : p.title_en %></h3>
+              <span class="inline-block text-xs px-2 py-0.5 rounded bg-green-50 text-green-600 mt-2">MOQ: <%= p.moq || 'Contact' %></span>
+            </div>
+          </a>
+        <% }) %>
+      <% } else { %>
+        <p class="col-span-3 text-center text-gray-400 py-10"><%= lang==='zh' ? '暂无产品' : 'No products yet' %></p>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<!-- CTA -->
+<section class="py-20 px-4 bg-[#2ab39f]">
+  <div class="max-w-4xl mx-auto text-center text-white">
+    <h2 class="text-3xl font-bold mb-4"><%= lang==='zh' ? '立即获取免费报价' : 'Get a Free Quote' %></h2>
+    <p class="text-lg text-white/80 mb-8"><%= lang==='zh' ? '发送您的需求，我们将在 24 小时内为您提供专业方案' : 'Send your requirements, we\'ll reply within 24h' %></p>
+    <a href="/contact" class="inline-block bg-white text-[#2ab39f] font-semibold px-10 py-3.5 rounded-lg hover:bg-gray-100 transition"><%= lang==='zh' ? '获取报价' : 'Get Quote' %></a>
+  </div>
+</section>
+
+<%- include('../partials/footer', { config, lang }) %>

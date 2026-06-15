@@ -1,0 +1,26 @@
+<%- include('../partials/header', { config, lang, path: '/products' }) %>
+<div class="banner-placeholder banner-placeholder-sm"><div class="relative z-10 text-center px-4"><h1 class="text-3xl md:text-4xl font-bold text-white"><%= lang==='zh' ? '产品中心' : 'Products' %></h1></div></div>
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2"><a href="/" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '首页' : 'Home' %></a><span>/</span><span class="text-[#2ab39f] font-medium"><%= lang==='zh' ? '产品中心' : 'Products' %></span></nav>
+  <div class="flex flex-col lg:flex-row gap-8">
+    <aside class="lg:w-64 flex-shrink-0">
+      <div class="bg-white rounded-xl border border-gray-200 p-4 sticky top-20">
+        <h3 class="font-semibold mb-3"><%= lang==='zh' ? '产品分类' : 'Categories' %></h3>
+        <a href="/products" class="block px-3 py-2 rounded-lg <%= !catId ? 'bg-[#e6f7f4] text-[#2ab39f] font-medium' : 'hover:bg-gray-50' %>"><%= lang==='zh' ? '全部产品' : 'All' %></a>
+        <% if (categories && categories.length) { categories.forEach(c => { %>
+          <a href="/products?category_id=<%= c.id %>" class="block px-3 py-2 rounded-lg <%= catId==c.id ? 'bg-[#e6f7f4] text-[#2ab39f] font-medium' : 'text-gray-600 hover:bg-gray-50' %>"><%= lang==='zh' ? c.name_zh : c.name_en %></a>
+        <% }) } %>
+      </div>
+    </aside>
+    <div class="flex-1">
+      <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-5">
+        <% if (products && products.length) { products.forEach(p => { %>
+          <a href="/products/<%= p.slug %>" class="product-card"><div class="h-40 bg-gradient-to-br from-gray-100 to-gray-200"></div><div class="p-3"><h3 class="font-semibold text-sm"><%= lang==='zh' ? p.title_zh : p.title_en %></h3><span class="inline-block text-xs px-2 py-0.5 rounded bg-green-50 text-green-600 mt-1">MOQ: <%= p.moq || 'Contact' %></span></div></a>
+        <% }) } else { %>
+          <p class="col-span-4 text-center text-gray-400 py-10"><%= lang==='zh' ? '暂无产品' : 'No products' %></p>
+        <% } %>
+      </div>
+    </div>
+  </div>
+</div>
+<%- include('../partials/footer', { config, lang }) %>

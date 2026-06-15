@@ -1,0 +1,196 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>管理后台 - 富丽雅</title><script src="https://cdn.tailwindcss.com"></script></head><body>
+<div id="app" class="flex min-h-screen bg-gray-100">
+<!-- Sidebar --><aside class="w-60 bg-[#0f172a] flex-shrink-0 min-h-screen">
+<div class="p-5 border-b border-slate-800"><div class="flex items-center gap-2.5"><div class="w-9 h-9 rounded-lg bg-[#2ab39f] flex items-center justify-center text-white font-bold text-sm">富</div><div><div class="text-white font-semibold text-sm">富丽雅管理</div><div class="text-xs text-slate-500">Admin Panel</div></div></div></div>
+<nav class="py-3" id="adminNav">
+<div class="px-4 py-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">概览</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 border-l-3 border-transparent transition" data-page="dashboard" style="border-left:3px solid transparent">📊 数据仪表盘</a>
+<div class="px-4 py-2 mt-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">内容管理</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="products">📦 产品管理</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="news">📰 新闻管理</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="cases">📋 案例管理</a>
+<div class="px-4 py-2 mt-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">页面</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="pages">🏗️ 页面模块编辑</a>
+<div class="px-4 py-2 mt-2 text-xs font-semibold text-slate-500 uppercase tracking-wider">系统</div>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="settings">⚙️ 全站配置</a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="messages">💬 留言管理 <span id="msgBadge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span></a>
+<a class="flex items-center gap-3 px-4 py-3 text-slate-400 text-sm cursor-pointer hover:bg-slate-800 hover:text-slate-200 transition" data-page="tools">🔧 系统工具</a>
+</nav></aside>
+
+<!-- Content --><div class="flex-1">
+<div class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-10"><span class="text-sm text-gray-400">当前页面：<span id="pageTitle" class="font-semibold text-gray-800">数据仪表盘</span></span><div class="flex items-center gap-3"><span class="text-sm text-gray-600" id="adminInfo"></span><button onclick="logout()" class="text-sm text-red-500 hover:underline">退出</button></div></div>
+<div class="p-6" id="pageContent">
+<!-- Content loaded dynamically -->
+<style>.active-page{border-left-color:#2ab39f!important;background:rgba(42,179,159,.08)!important;color:#2ab39f!important}.section-title{font-size:1.25rem;font-weight:700;margin-bottom:1rem}.admin-table{width:100%;border-collapse:collapse}.admin-table th{text-align:left;padding:.75rem 1rem;font-size:.8125rem;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:2px solid #e5e7eb}.admin-table td{padding:.75rem 1rem;font-size:.875rem;border-bottom:1px solid #f1f5f9;color:#334155}.admin-table tr:hover td{background:#f8fafc}.badge{padding:.1875rem .625rem;border-radius:9999px;font-size:.75rem;font-weight:500}.badge-green{background:#dcfce7;color:#15803d}.badge-yellow{background:#fef9c3;color:#a16207}.badge-gray{background:#f1f5f9;color:#64748b}.form-input{width:100%;padding:.625rem .875rem;border:1px solid #d1d5db;border-radius:.5rem;font-size:.875rem;outline:none;transition:all .2s}.form-input:focus{border-color:#2ab39f;box-shadow:0 0 0 3px rgba(42,179,159,.15)}.form-label{display:block;font-size:.8125rem;font-weight:600;color:#374151;margin-bottom:.375rem}.stat-card{background:#fff;border-radius:.75rem;padding:1.5rem;border:1px solid #e5e7eb}.stat-card:hover{border-color:#2ab39f}</style></div></div></div>
+
+<script>
+const TOKEN = localStorage.getItem('admin_token');
+if(!TOKEN && location.pathname !== '/admin'){ location.href='/admin' }
+
+async function api(url, opt={}){
+  opt.headers = opt.headers || {};
+  opt.headers['Authorization'] = 'Bearer ' + TOKEN;
+  if(opt.body && typeof opt.body === 'object'){ opt.body = JSON.stringify(opt.body); opt.headers['Content-Type']='application/json' }
+  const r = await fetch(url, opt); const j = await r.json();
+  if(j.code === -1 && j.msg === '未登录'){ localStorage.removeItem('admin_token'); location.href='/admin' }
+  return j;
+}
+
+const pages = {
+  dashboard: { title:'数据仪表盘', render: renderDashboard },
+  products: { title:'产品管理', render: renderProducts },
+  news: { title:'新闻管理', render: renderNews },
+  cases: { title:'案例管理', render: renderCases },
+  pages: { title:'页面模块编辑', render: renderPages },
+  settings: { title:'全站配置', render: renderSettings },
+  messages: { title:'留言管理', render: renderMessages },
+  tools: { title:'系统工具', render: renderTools }
+};
+
+function switchPage(name){
+  document.querySelectorAll('#adminNav a').forEach(a => a.classList.remove('active-page'));
+  document.querySelector(`#adminNav a[data-page="${name}"]`)?.classList.add('active-page');
+  document.getElementById('pageTitle').textContent = pages[name]?.title || name;
+  document.getElementById('pageContent').innerHTML = '<div class="text-center py-10 text-gray-400">加载中...</div>';
+  pages[name]?.render();
+}
+
+document.querySelectorAll('#adminNav a[data-page]').forEach(a => {
+  a.addEventListener('click', () => switchPage(a.dataset.page));
+});
+
+// === Dashboard ===
+async function renderDashboard(){
+  const d = await api('/admin-api/dashboard');
+  if(!d.data) return;
+  const s = d.data;
+  document.getElementById('pageContent').innerHTML = `
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+    <div class="stat-card"><div class="text-sm text-gray-500 mb-2">产品总数</div><div class="text-3xl font-bold">${s.products}</div><div class="flex gap-2 mt-2"><span class="badge badge-green">${s.productOn} 上架</span><span class="badge badge-gray">${s.productOff} 下架</span></div></div>
+    <div class="stat-card"><div class="text-sm text-gray-500 mb-2">新闻动态</div><div class="text-3xl font-bold">${s.news}</div></div>
+    <div class="stat-card"><div class="text-sm text-gray-500 mb-2">客户案例</div><div class="text-3xl font-bold">${s.cases}</div></div>
+    <div class="stat-card"><div class="text-sm text-gray-500 mb-2">未处理留言</div><div class="text-3xl font-bold text-red-500">${s.unread}</div></div>
+  </div>
+  <div class="bg-white rounded-xl border p-6"><h2 class="font-semibold mb-4">快捷操作</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+    <a onclick="switchPage('products')" class="p-3 rounded-lg bg-[#e6f7f4] text-[#2ab39f] font-medium text-sm text-center cursor-pointer hover:bg-[#2ab39f] hover:text-white transition">＋ 新增产品</a>
+    <a onclick="switchPage('news')" class="p-3 rounded-lg bg-blue-50 text-blue-600 font-medium text-sm text-center cursor-pointer hover:bg-blue-500 hover:text-white transition">📰 发布新闻</a>
+    <a onclick="switchPage('messages')" class="p-3 rounded-lg bg-amber-50 text-amber-600 font-medium text-sm text-center cursor-pointer hover:bg-amber-500 hover:text-white transition">📋 查看留言</a>
+    <a onclick="switchPage('settings')" class="p-3 rounded-lg bg-gray-100 text-gray-600 font-medium text-sm text-center cursor-pointer hover:bg-gray-200 transition">⚙️ 系统设置</a>
+  </div></div>`;
+}
+
+// === Products ===
+async function renderProducts(){
+  const d = await api('/admin-api/products');
+  const cats = (await api('/admin-api/categories')).data || [];
+  const list = d.data?.list || [];
+  document.getElementById('pageContent').innerHTML = `
+  <div class="flex items-center justify-between mb-4"><h2 class="section-title">产品管理 (${d.data?.total || 0})</h2><button onclick="switchPage('settings')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm font-medium">＋ 新增产品</button></div>
+  <div class="bg-white rounded-xl border overflow-hidden"><table class="admin-table">
+  <thead><tr><th>产品名称</th><th>分类</th><th>MOQ</th><th>状态</th><th>操作</th></tr></thead><tbody>
+  ${list.map(p => `<tr><td class="font-medium">${p.title_zh}</td><td>${p.cat||'-'}</td><td>${p.moq||'-'}</td><td><span class="badge ${p.status===1?'badge-green':'badge-gray'}">${p.status===1?'上架':'下架'}</span></td>
+  <td><div class="flex gap-2"><span class="text-primary text-sm cursor-pointer" onclick="toggleProduct(${p.id},${p.status===1?0:1})">${p.status===1?'下架':'上架'}</span></div></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+async function toggleProduct(id, status){
+  await api(`/admin-api/products/${id}`, { method:'PUT', body: { status } });
+  renderProducts();
+}
+
+// === News ===
+async function renderNews(){
+  const d = await api('/admin-api/news');
+  const list = d.data?.list || [];
+  document.getElementById('pageContent').innerHTML = `
+  <div class="flex items-center justify-between mb-4"><h2 class="section-title">新闻管理 (${d.data?.total||0})</h2></div>
+  <div class="bg-white rounded-xl border overflow-hidden"><table class="admin-table">
+  <thead><tr><th>标题</th><th>状态</th><th>时间</th><th>操作</th></tr></thead><tbody>
+  ${list.map(n => `<tr><td class="font-medium">${n.title_zh}</td><td><span class="badge ${n.status===1?'badge-green':'badge-gray'}">${n.status===1?'已发布':'下架'}</span></td><td class="text-sm text-gray-400">${new Date(n.create_time).toLocaleDateString()}</td>
+  <td><span class="text-primary text-sm cursor-pointer" onclick="toggleNews(${n.id},${n.status===1?0:1})">${n.status===1?'下架':'发布'}</span></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+async function toggleNews(id, status){ await api(`/admin-api/news/${id}`, { method:'PUT', body: { status } }); renderNews(); }
+
+// === Cases ===
+async function renderCases(){
+  const d = await api('/admin-api/cases');
+  const list = d.data?.list || [];
+  document.getElementById('pageContent').innerHTML = `
+  <div class="flex items-center justify-between mb-4"><h2 class="section-title">案例管理 (${d.data?.total||0})</h2></div>
+  <div class="bg-white rounded-xl border overflow-hidden"><table class="admin-table">
+  <thead><tr><th>案例名称</th><th>客户</th><th>状态</th><th>操作</th></tr></thead><tbody>
+  ${list.map(c => `<tr><td class="font-medium">${c.title_zh}</td><td>${c.client_name}</td><td><span class="badge ${c.status===1?'badge-green':'badge-gray'}">${c.status===1?'展示中':'下架'}</span></td>
+  <td><span class="text-primary text-sm cursor-pointer" onclick="toggleCase(${c.id},${c.status===1?0:1})">${c.status===1?'下架':'展示'}</span></td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+async function toggleCase(id, status){ await api(`/admin-api/cases/${id}`, { method:'PUT', body: { status } }); renderCases(); }
+
+// === Pages Module Editor ===
+async function renderPages(){
+  document.getElementById('pageContent').innerHTML = `<div class="bg-white rounded-xl border p-6"><h2 class="section-title">页面模块编辑</h2><p class="text-sm text-gray-400 mb-6">选择页面进行模块编辑</p>
+  <div class="flex gap-2 flex-wrap mb-6">${['首页','产品中心','产品详情','关于我们','企业实力','客户案例','新闻中心','联系我们'].map(p => `<span class="px-4 py-2 rounded-lg bg-gray-100 text-gray-600 text-sm cursor-pointer hover:bg-[#2ab39f] hover:text-white transition">${p}</span>`).join('')}</div>
+  <div class="space-y-4">
+    <div class="p-4 border rounded-lg"><div class="flex items-center justify-between"><div><h3 class="font-semibold">全屏 Banner</h3><span class="text-xs text-gray-400">首页顶部</span></div><label class="flex items-center gap-2"><span class="text-xs text-green-600">显示中</span><input type="checkbox" checked class="accent-[#2ab39f]"></label></div></div>
+    <div class="p-4 border rounded-lg"><div class="flex items-center justify-between"><div><h3 class="font-semibold">四大核心优势</h3><span class="text-xs text-gray-400">首页</span></div><label class="flex items-center gap-2"><span class="text-xs text-green-600">显示中</span><input type="checkbox" checked class="accent-[#2ab39f]"></label></div></div>
+    <div class="p-4 border rounded-lg"><div class="flex items-center justify-between"><div><h3 class="font-semibold">发展历程</h3><span class="text-xs text-gray-400">关于我们</span></div><label class="flex items-center gap-2"><span class="text-xs text-green-600">显示中</span><input type="checkbox" checked class="accent-[#2ab39f]"></label></div></div>
+  </div></div>`;
+}
+
+// === Settings ===
+async function renderSettings(){
+  document.getElementById('pageContent').innerHTML = `<div class="bg-white rounded-xl border p-6"><h2 class="section-title">全站配置</h2>
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div><label class="form-label">站点标题（中文）</label><input class="form-input" value="广州富丽雅实业有限公司"></div>
+    <div><label class="form-label">站点标题（英文）</label><input class="form-input" value="Guangzhou Fuliya Industry Co., Ltd."></div>
+    <div><label class="form-label">联系电话</label><input class="form-input" value="+86-20-12345678"></div>
+    <div><label class="form-label">邮箱</label><input class="form-input" value="info@fuliya.com"></div>
+    <div><label class="form-label">WhatsApp</label><input class="form-input" value="+86-138-0000-0000"></div>
+    <div><label class="form-label">LinkedIn</label><input class="form-input" value="linkedin.com/company/fuliya"></div>
+    <div class="lg:col-span-2"><label class="form-label">公司地址</label><input class="form-input" value="广州市白云区某某路 88 号"></div>
+    <div><label class="form-label">全站默认语言</label><select class="form-input"><option>中文</option><option>English</option></select></div>
+    <div><label class="form-label">ICP 备案号</label><input class="form-input" value="粤ICP备XXXXXXXX号"></div>
+  </div>
+  <button onclick="alert('配置已保存(演示功能)')" class="mt-6 bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm font-medium">保存配置</button>
+  </div>`;
+}
+
+// === Messages ===
+async function renderMessages(){
+  const d = await api('/admin-api/messages');
+  const list = d.data?.list || [];
+  document.getElementById('msgBadge').textContent = list.filter(m => m.status===0).length;
+  document.getElementById('msgBadge').classList.toggle('hidden', !list.some(m => m.status===0));
+  document.getElementById('pageContent').innerHTML = `
+  <div class="flex items-center justify-between mb-4"><h2 class="section-title">留言管理 (${d.data?.total||0})</h2></div>
+  <div class="bg-white rounded-xl border overflow-hidden"><table class="admin-table">
+  <thead><tr><th>姓名</th><th>公司</th><th>邮箱</th><th>需求</th><th>时间</th><th>状态</th><th>操作</th></tr></thead><tbody>
+  ${list.map(m => `<tr><td class="font-medium">${m.name}</td><td>${m.company||'-'}</td><td class="text-sm">${m.email}</td><td class="max-w-xs truncate text-sm">${(m.demand||'').slice(0,30)}</td><td class="text-sm text-gray-400">${new Date(m.create_time).toLocaleDateString()}</td>
+  <td><span class="badge ${m.status===0?'badge-yellow':'badge-green'}">${m.status===0?'未处理':'已处理'}</span></td>
+  <td>${m.status===0 ? `<span class="text-primary text-sm cursor-pointer" onclick="markMessage(${m.id})">标记已处理</span>` : '<span class="text-gray-400 text-sm">已处理</span>'}</td></tr>`).join('')}
+  </tbody></table></div>`;
+}
+async function markMessage(id){ await api(`/admin-api/messages/${id}`, { method:'PUT' }); renderMessages(); }
+
+// === Tools ===
+function renderTools(){
+  document.getElementById('pageContent').innerHTML = `<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+    <div class="bg-white rounded-xl border p-6"><h3 class="font-semibold mb-4">📄 SEO 文件管理</h3><div class="space-y-3">
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">sitemap.xml</span><button onclick="alert('sitemap 已更新(演示)')" class="text-sm text-[#2ab39f]">立即更新</button></div>
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">robots.txt</span><span class="text-sm text-gray-400">已配置</span></div>
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">llms.txt</span><button onclick="alert('llms.txt 已生成(演示)')" class="text-sm text-[#2ab39f]">生成</button></div>
+    </div></div>
+    <div class="bg-white rounded-xl border p-6"><h3 class="font-semibold mb-4">🗄️ 数据库管理</h3><div class="space-y-3">
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">数据库备份</span><button onclick="alert('备份完成(演示)')" class="text-sm text-[#2ab39f]">立即备份</button></div>
+      <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">数据恢复</span><button onclick="alert('请选择备份文件(演示)')" class="text-sm text-[#2ab39f]">上传恢复</button></div>
+    </div></div>
+  </div>`;
+}
+
+function logout(){ localStorage.removeItem('admin_token'); localStorage.removeItem('admin_nickname'); location.href='/admin'; }
+
+// Init
+switchPage('dashboard');
+document.getElementById('adminInfo').textContent = '👤 ' + (localStorage.getItem('admin_nickname') || '管理员');
+</script>
+</body></html>

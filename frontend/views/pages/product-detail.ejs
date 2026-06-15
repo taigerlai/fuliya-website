@@ -1,0 +1,31 @@
+<%- include('../partials/header', { config, lang, path: '/products/' + (product?.slug || '') }) %>
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2"><a href="/" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '首页' : 'Home' %></a><span>/</span><a href="/products" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '产品中心' : 'Products' %></a><span>/</span><span class="text-[#2ab39f] font-medium"><%= lang==='zh' ? product?.title_zh : product?.title_en %></span></nav>
+  <div class="flex flex-col lg:flex-row gap-10">
+    <div class="lg:w-1/2">
+      <div class="h-96 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400"><%= lang==='zh' ? '产品主图' : 'Product Image' %></div>
+      <% if (product?.images && product.images.length) { %>
+      <div class="grid grid-cols-4 gap-3 mt-4"><% product.images.forEach(img => { %><div class="h-20 rounded-lg bg-gray-100"></div><% }) %></div>
+      <% } %>
+    </div>
+    <div class="lg:w-1/2">
+      <h1 class="text-2xl md:text-3xl font-bold mb-2"><%= lang==='zh' ? product?.title_zh : product?.title_en %></h1>
+      <table class="w-full border-collapse mb-6 mt-6">
+        <tbody>
+          <% if (product?.specs) { Object.entries(product.specs).forEach(([k,v]) => { %>
+          <tr class="border-b border-gray-100"><td class="py-2.5 text-sm text-gray-500 w-36"><%= k %></td><td class="py-2.5 text-sm font-medium"><%= v %></td></tr>
+          <% }) } %>
+          <% if (product?.moq) { %><tr class="border-b border-gray-100"><td class="py-2.5 text-sm text-gray-500">MOQ</td><td class="py-2.5 text-sm font-medium"><%= product.moq %></td></tr><% } %>
+        </tbody>
+      </table>
+      <a href="/contact" class="inline-block bg-[#2ab39f] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#1f8e7d] transition"><%= lang==='zh' ? '立即询价' : 'Inquire Now' %></a>
+    </div>
+  </div>
+  <% if (product?.content_zh || product?.content_en) { %>
+  <section class="mt-16">
+    <h2 class="text-xl font-bold mb-6"><%= lang==='zh' ? '产品描述' : 'Description' %></h2>
+    <div class="text-gray-600 leading-relaxed"><%= lang==='zh' ? product.content_zh : product.content_en %></div>
+  </section>
+  <% } %>
+</div>
+<%- include('../partials/footer', { config, lang }) %>
