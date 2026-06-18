@@ -1,0 +1,455 @@
+<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>产品<% if (product?.id) { %>编辑<% } else { %>新增<% } %> - 富丽雅管理</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>window.tailwind||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.17/index.global.min.js"><\/script>')</script>
+<style>
+body{font-family:Noto Sans SC,Inter,sans-serif;background:#f1f5f9;margin:0}
+.sd{display:flex;align-items:center;padding:12px 20px;color:#94a3b8;cursor:pointer;border-left:3px solid transparent;font-size:14px;text-decoration:none}
+.sd:hover{background:#1e293b;color:#e2e8f0}
+.sd.a{background:rgba(42,179,159,.1);color:#2ab39f;border-left-color:#2ab39f}
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:2px solid #e5e7eb}
+.tbl td{padding:10px 16px;font-size:14px;border-bottom:1px solid #f1f5f9}
+.fi{width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;box-sizing:border-box}
+.fi:focus{border-color:#2ab39f;box-shadow:0 0 0 3px rgba(42,179,159,.15)}
+.fia{width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none;resize:vertical;box-sizing:border-box}
+.fia:focus{border-color:#2ab39f;box-shadow:0 0 0 3px rgba(42,179,159,.15)}
+.bdg{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px}.bdg-g{background:#dcfce7;color:#15803d}
+.bdg-y{background:#fef9c3;color:#a16207}.bdg-gy{background:#f1f5f9;color:#64748b}
+.mo{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}
+.mb{background:#fff;border-radius:16px;padding:24px;width:90%;max-width:700px;max-height:85vh;overflow-y:auto}
+.tp{padding:16px 24px;font-size:14px;font-weight:500;color:#64748b;cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;background:none;white-space:nowrap}
+.tp:hover{color:#334155}
+.tp.a{color:#2ab39f;border-bottom-color:#2ab39f}
+.tc{display:none;padding:24px;background:#fff;border-radius:0 8px 8px 8px;margin-top:0;border:1px solid #e5e7eb;border-top:none}
+.tc.a{display:block}
+.fg{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:20px}
+.lb{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:6px}
+.lbr{display:block;font-size:13px;font-weight:500;color:#374151;margin-bottom:6px}
+.lbr::after{content:" *";color:#ef4444}
+.ht{font-size:12px;color:#94a3b8;margin-top:4px}
+.block-ghost{padding:24px;border:2px dashed #d1d5db;border-radius:8px;text-align:center;color:#94a3b8;cursor:pointer;transition:all .2s}
+.block-ghost:hover{border-color:#2ab39f;color:#2ab39f}
+.block-item{border:1px solid #e5e7eb;border-radius:8px;padding:16px;margin-bottom:12px;background:#fff;position:relative}
+.block-item:hover{border-color:#2ab39f}
+.block-handle{position:absolute;left:-8px;top:50%;transform:translateY(-50%);width:20px;height:32px;background:#f1f5f9;border:1px solid #e5e7eb;border-radius:4px;cursor:grab;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:12px}
+.block-handle:hover{background:#e2e8f0}
+</style></head><body>
+<div class="flex" style="min-height:100vh">
+<!-- 左侧导航 -->
+<div class="w-60 bg-[#0f172a] fixed h-full" style="z-index:50">
+<div class="p-5 border-b border-slate-800"><div class="text-white font-bold">富丽雅管理</div><div class="text-xs text-slate-500 mt-1">Admin Panel</div></div>
+<div id="nav" class="py-3">
+<a href="/admin" class="sd">仪表盘</a>
+<a href="/admin/products" class="sd a">产品管理</a>
+<a href="/admin/news" class="sd">新闻管理</a>
+<a href="/admin/cases" class="sd">案例管理</a>
+<a href="/admin/pages" class="sd">页面编辑</a>
+<a href="/admin/config" class="sd">全站配置</a>
+<a href="/admin/messages" class="sd">留言管理</a>
+<a href="/admin/tools" class="sd">系统工具</a>
+</div></div>
+
+<!-- 右侧内容区 -->
+<div class="flex-1 ml-60">
+<div class="bg-white border-b h-16 flex items-center justify-between px-6 sticky top-0 z-40">
+  <div class="flex items-center">
+    <span class="text-sm text-gray-400">当前：</span>
+    <span class="font-semibold text-gray-800 ml-1"><%= product?.id ? '编辑产品' : '新增产品' %></span>
+    <span class="ml-3 bdg bdg-y"><%= product?.status || '草稿' %></span>
+  </div>
+  <div class="flex items-center space-x-3">
+    <a href="/admin/products/<%= product?.id || '' %>/preview" target="_blank" class="px-3 py-1.5 text-sm text-gray-600 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">预览</a>
+    <button onclick="saveDraft()" class="px-3 py-1.5 text-sm text-gray-700 bg-white border border-gray-300 rounded-lg hover:bg-gray-50 transition">保存草稿</button>
+    <button onclick="publish()" class="px-4 py-1.5 text-sm text-white bg-[#2ab39f] rounded-lg hover:bg-[#1f8e7d] transition font-medium">保存并发布</button>
+    <button onclick="history.back()" class="px-3 py-1.5 text-sm text-gray-600 bg-gray-100 rounded-lg hover:bg-gray-200 transition">取消</button>
+  </div>
+</div>
+
+<div class="p-6">
+<h1 class="text-xl font-bold text-gray-800 mb-1"><%= product?.id ? '编辑产品' : '新增产品' %></h1>
+<p class="text-gray-500 text-sm mb-6">填写完整后点击「保存并发布」，前台将自动生成产品详情页</p>
+
+<!-- Tab 导航 -->
+<div class="flex border-b bg-white rounded-t-lg px-2 overflow-x-auto">
+  <button class="tp a" data-tab="basic">📋 基础信息</button>
+  <button class="tp" data-tab="specs">📏 规格参数</button>
+  <button class="tp" data-tab="media">🖼 图片与详情</button>
+  <button class="tp" data-tab="highlights">⭐ 卖点与标签</button>
+  <button class="tp" data-tab="seo">🔍 SEO/GEO</button>
+  <button class="tp" data-tab="related">🔗 关联推荐</button>
+  <button class="tp" data-tab="faq">❓ FAQ</button>
+</div>
+
+<form id="pf" onsubmit="return false">
+
+<!-- Tab1: 基础信息 -->
+<div class="tc a" id="c-basic">
+  <div class="fg">
+    <div class="col-span-2"><label class="lbr">产品标题（最多 200 字符）</label><input type="text" class="fi" maxlength="200" value="<%= product?.title_zh || '' %>" placeholder="Custom Large Capacity Anti-Theft Business Laptop Backpack"></div>
+    <div><label class="lbr">产品分类</label><select class="fi"><option value=""><%= lang==='zh' ? '请选择三级分类' : 'Select category' %></option><% if(categories && categories.length){ %><% categories.forEach(c => { %><option value="<%= c.id %>" <%= product?.category_id==c.id?'selected':'' %>><%= c.name_zh %></option><% }) %><% } %></select></div>
+    <div><label class="lbr">品牌名称</label><input type="text" class="fi" value="<%= product?.brand || 'FULIYA' %>"></div>
+    <div><label class="lb">产品简称（10 字以内）</label><input type="text" class="fi" maxlength="20" value="<%= product?.short_name || '' %>" placeholder="用于推荐位、列表卡片"></div>
+    <div class="col-span-2"><label class="lb">基础简介</label><textarea class="fia" rows="3" placeholder="产品核心优势一句话总结"><%= product?.summary || '' %></textarea></div>
+    <div><label class="lbr">产品状态</label><div class="flex items-center gap-4 mt-2"><label class="flex items-center"><input type="radio" name="status" value="draft" <%= (!product||product.status==='draft')?'checked':'' %> class="mr-1"><span class="text-sm">草稿</span></label><label class="flex items-center"><input type="radio" name="status" value="published" <%= product?.status==='published'?'checked':'' %> class="mr-1"><span class="text-sm">已上架</span></label><label class="flex items-center"><input type="radio" name="status" value="unpublished" <%= product?.status==='unpublished'?'checked':'' %> class="mr-1"><span class="text-sm">已下架</span></label></div></div>
+  </div>
+</div>
+
+<!-- Tab2: 规格参数 -->
+<div class="tc" id="c-specs">
+  <p class="text-sm text-gray-500 mb-4"><%= lang==='zh' ? '支持新增 / 删除 / 拖拽排序行，前台自动生成绿色表头规格表' : 'Add, delete, drag rows; auto renders as green-header parameter table on frontend' %></p>
+  <table class="tbl" id="specs-table">
+    <thead><tr><th style="width:32px">#</th><th><%= lang==='zh' ? '参数名称' : 'Parameter Name' %></th><th><%= lang==='zh' ? '参数内容' : 'Parameter Value' %></th><th style="width:80px"><%= lang==='zh' ? '操作' : 'Action' %></th></tr></thead>
+    <tbody id="specs-body">
+      <% let specs = product?.specs && product.specs.length ? product.specs : [
+        {name:'Material 材质',value:'Oxford, customized'},
+        {name:'Size 尺寸',value:'W31*D15*H43cm, Customized'},
+        {name:'Color 颜色',value:'Black,Gray,Customized'},
+        {name:'Technics 工艺',value:'Silkscreen or heat transfer printing'},
+        {name:'Application 适用场景',value:'Travel/Work/School/Business Trip'},
+        {name:'Minimum quantity 起订量',value:'500pcs/style'},
+        {name:'Sample lead time 样品周期',value:'7-10days'},
+        {name:'Bulk Lead time 大货周期',value:'Usually 30-40 days'},
+        {name:'Payment terms 付款方式',value:'T/T'},
+        {name:'Certificate 资质证书',value:'DISNEY/BSCI/ISO14001'},
+        {name:'Packing 包装方式',value:'PE bag + carton'}
+      ]; %>
+      <% specs.forEach((s,i) => { %>
+        <tr data-index="<%= i %>"><td class="text-center text-gray-400 cursor-grab">⠿</td><td><input type="text" class="fi" value="<%= s.name %>"></td><td><input type="text" class="fi" value="<%= s.value %>"></td><td class="text-center"><button class="text-red-400 hover:text-red-600 text-xs" onclick="this.closest('tr').remove()"><%= lang==='zh' ? '删除' : 'Del' %></button></td></tr>
+      <% }) %>
+    </tbody>
+  </table>
+  <button class="mt-3 text-sm text-[#2ab39f] hover:text-[#1f8e7d] font-medium" onclick="addSpecRow()">+ <%= lang==='zh' ? '新增一行' : 'Add Row' %></button>
+</div>
+
+<!-- Tab3: 图片与详情 -->
+<div class="tc" id="c-media">
+  <h3 class="font-semibold text-gray-800 mb-3"><%= lang==='zh' ? '主图轮播' : 'Main Images' %></h3>
+  <div class="flex flex-wrap gap-3 mb-6">
+    <div class="w-24 h-24 rounded-lg border-2 border-dashed border-gray-300 flex items-center justify-center text-gray-400 cursor-pointer hover:border-[#2ab39f] transition text-xs text-center"><div>📷<br><%= lang==='zh' ? '上传' : 'Upload' %></div></div>
+    <% if (product?.images) { product.images.forEach((img,i) => { %>
+      <div class="w-24 h-24 rounded-lg border border-gray-200 overflow-hidden relative"><img src="<%= img.url %>" class="w-full h-full object-cover"><button class="absolute top-1 right-1 w-5 h-5 bg-red-500 text-white rounded-full text-xs flex items-center justify-center">×</button></div>
+    <% }) } %>
+  </div>
+
+  <h3 class="font-semibold text-gray-800 mb-3"><%= lang==='zh' ? '详情内容模块化编辑' : 'Detail Blocks' %></h3>
+  <p class="text-sm text-gray-500 mb-4"><%= lang==='zh' ? '自由添加内容区块，拖拽调整顺序，前台严格按顺序渲染' : 'Add content blocks freely, drag to reorder' %></p>
+  <div id="blocks-container">
+    <% if (product?.blocks && product.blocks.length) { %>
+      <% product.blocks.forEach((b,i) => { %>
+        <div class="block-item" data-block-type="<%= b.type %>">
+          <div class="block-handle">⠿</div>
+          <div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-gray-700"><%= b.type==='image'?'单图':b.type==='grid'?'多图网格':b.type==='heading'?'标题':b.type==='text'?'正文':b.type==='image-text'?'左右图文':b.type %></span><button class="text-gray-400 hover:text-red-500 text-xs">删除</button></div>
+          <div class="text-sm text-gray-400"><%= lang==='zh' ? '（区块内容占位）' : '(Block content placeholder)' %></div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+  <div class="block-ghost mt-4" onclick="addBlock()"><%= lang==='zh' ? '+ 添加区块' : '+ Add Block' %></div>
+</div>
+
+<!-- Tab4: 卖点与标签 -->
+<div class="tc" id="c-highlights">
+  <p class="text-sm text-gray-500 mb-4"><%= lang==='zh' ? '每行一个核心卖点，前台在 Quick Details 板块展示' : 'Each row = one selling point, displayed in Quick Details section' %></p>
+  <div id="highlights-container">
+    <% let hl = product?.highlights && product.highlights.length ? product.highlights : [
+      {title:'Best For',text:'Students, business travelers'},
+      {title:'Use Cases',text:'Travel, Work, School, Business Trip'},
+      {title:'Large Main Compartment',text:'Fits 15.6" laptop, books, clothes'},
+      {title:'Multi-Compartment',text:'Multiple pockets for organized storage'},
+      {title:'Water-resistant Fabric',text:'Durable Oxford material'},
+      {title:'Breathable Strap',text:'Ergonomic padded shoulder strap'},
+      {title:'Luggage Strap',text:'Back strap fits over luggage handle'},
+      {title:'Custom Service',text:'LOGO, color, size customization'}
+    ]; %>
+    <% hl.forEach(h => { %>
+      <div class="block-item"><div class="flex gap-3 mb-2"><div class="flex-1"><input type="text" class="fi" value="<%= h.title %>" placeholder="<%= lang==='zh' ? '卖点标题' : 'Title' %>"></div><div class="flex-1"><input type="text" class="fi" value="<%= h.text %>" placeholder="<%= lang==='zh' ? '卖点说明' : 'Description' %>"></div><button class="text-gray-400 hover:text-red-500 text-xs self-center">×</button></div></div>
+    <% }) %>
+  </div>
+  <button class="mt-3 text-sm text-[#2ab39f] hover:text-[#1f8e7d] font-medium" onclick="addHighlight()">+ <%= lang==='zh' ? '新增卖点' : 'Add Selling Point' %></button>
+
+  <h3 class="font-semibold text-gray-800 mt-8 mb-3"><%= lang==='zh' ? '产品标签 Tags' : 'Product Tags' %></h3>
+  <input type="text" class="fi" value="<%= (product?.tags||[]).join(', ') %>" placeholder="laptop backpack, travel backpack, custom backpack">
+  <div class="ht"><%= lang==='zh' ? '逗号分隔，建议 5-15 个关键词' : 'Comma separated, 5-15 keywords recommended' %></div>
+</div>
+
+<!-- Tab5: SEO/GEO -->
+<div class="tc" id="c-seo">
+  <div class="fg">
+    <div><label class="lb">SEO 标题</label><input type="text" class="fi" value="<%= product?.seo_title || '' %>" placeholder="<%= lang==='zh' ? '不填则默认产品标题，建议 60 字符以内' : 'Defaults to product title, ≤60 chars' %>"></div>
+    <div><label class="lb">Meta 描述（最多 300 字符）</label><textarea class="fia" rows="2" maxlength="300" placeholder="<%= lang==='zh' ? '不填则自动截取简介+卖点' : 'Auto-generated from summary + highlights' %>"><%= product?.seo_desc || '' %></textarea></div>
+    <div><label class="lb">Meta 关键词</label><input type="text" class="fi" value="<%= (product?.seo_keywords||[]).join(', ') %>" placeholder="<%= lang==='zh' ? '不填则默认使用产品标签' : 'Defaults to product tags' %>"></div>
+    <div><label class="lb">URL 别名</label><input type="text" class="fi" value="<%= product?.slug || '' %>" placeholder="custom-large-capacity-laptop-backpack"><div class="ht"><%= lang==='zh' ? '仅英文、数字、横杠，不填自动生成' : 'Letters, numbers, hyphens only' %></div></div>
+    <div><label class="lb">标准链接 Canonical</label><input type="text" class="fi" value="<%= product?.canonical || '' %>" placeholder="https://..."></div>
+    <div class="col-span-2">
+      <div class="flex flex-wrap gap-6 mt-2">
+        <label class="flex items-center"><input type="checkbox" <%= product?.seo_indexed!==false?'checked':'' %> class="mr-2"><span class="text-sm"><%= lang==='zh' ? '允许搜索引擎收录' : 'Allow search indexing' %></span></label>
+        <label class="flex items-center"><input type="checkbox" <%= product?.auto_alt!==false?'checked':'' %> class="mr-2"><span class="text-sm"><%= lang==='zh' ? '自动生成图片 ALT' : 'Auto-generate image ALT' %></span></label>
+        <label class="flex items-center"><input type="checkbox" <%= product?.auto_structured!==false?'checked':'' %> class="mr-2"><span class="text-sm"><%= lang==='zh' ? '自动生成结构化数据' : 'Auto-generate structured data' %></span></label>
+      </div>
+    </div>
+  </div>
+  <div class="mt-6 bg-yellow-50 border border-yellow-200 rounded-lg p-4 flex items-start">
+    <span class="text-yellow-600 mr-2">💡</span>
+    <div class="text-sm text-yellow-700"><strong>GEO 提示：</strong><%= lang==='zh' ? 'SEO 配置将自动注入页面头部，生成 Product、BreadcrumbList、FAQPage 三类结构化数据，适配谷歌富摘要展示' : 'SEO config auto-injects page head meta + Product/BreadcrumbList/FAQPage structured data for Google rich snippets' %><!-- [GEO] --></div>
+  </div>
+</div>
+
+<!-- Tab6: 关联推荐 -->
+<div class="tc" id="c-related">
+  <div class="fg">
+    <div><label class="lb"><%= lang==='zh' ? '推荐栏标题' : 'Section Title' %></label><input type="text" class="fi" value="<%= product?.recommend_title || 'Product recommendation' %>"></div>
+    <div><label class="lb"><%= lang==='zh' ? '关联产品' : 'Related Products' %></label>
+      <select class="fi" multiple size="4">
+        <% if (allProducts && allProducts.length) { %>
+          <% allProducts.forEach(p => { %>
+            <option value="<%= p.id %>" <%= (product?.recommends||[]).some(r=>r.id===p.id||r===p.id)?'selected':'' %>><%= p.title_zh || p.title_en %></option>
+          <% }) %>
+        <% } else { %>
+          <option><%= lang==='zh' ? '暂无其他产品' : 'No other products' %></option>
+        <% } %>
+      </select>
+      <div class="ht"><%= lang==='zh' ? 'Ctrl+点击多选，拖拽排序' : 'Ctrl+click to select multiple' %></div>
+    </div>
+  </div>
+</div>
+
+<!-- Tab7: FAQ -->
+<div class="tc" id="c-faq">
+  <p class="text-sm text-gray-500 mb-4"><%= lang==='zh' ? 'FAQ 用于谷歌 FAQ 富卡片展示，获取额外搜索流量' : 'FAQs generate Google FAQ rich snippet for extra search traffic' %></p>
+  <div class="flex items-center gap-4 mb-4">
+    <label class="flex items-center"><input type="checkbox" <%= product?.faq_show===true?'checked':'' %> class="mr-2"><span class="text-sm"><%= lang==='zh' ? '页面底部展示 FAQ' : 'Show FAQ on page' %></span></label>
+    <span class="text-xs text-gray-400">|</span>
+    <span class="text-xs text-gray-500"><%= lang==='zh' ? '默认仅生成结构化数据不展示' : 'Default: structured data only, no page display' %></span>
+  </div>
+  <div id="faq-container">
+    <% let faqs = product?.faqs && product.faqs.length ? product.faqs : [
+      {q:'What is the MOQ for custom backpack?',a:'The MOQ is 500pcs per style.'},
+      {q:'How long is the sample lead time?',a:'Sample lead time is 7-10 days.'},
+      {q:'Can I print my own logo?',a:'Yes, we support silk screen, heat transfer, embroidery.'},
+      {q:'Is this backpack water resistant?',a:'Yes, Oxford fabric is water resistant.'}
+    ]; %>
+    <% faqs.forEach((faq,i) => { %>
+      <div class="block-item"><div class="block-handle">⠿</div><div class="flex gap-3"><div class="flex-1"><input type="text" class="fi mb-2" value="<%= faq.q %>" placeholder="<%= lang==='zh' ? '问题' : 'Question' %>"></div><div class="flex-1"><input type="text" class="fi mb-2" value="<%= faq.a %>" placeholder="<%= lang==='zh' ? '回答' : 'Answer' %>"></div><button class="text-gray-400 hover:text-red-500 text-xs self-start mt-2">×</button></div></div>
+    <% }) %>
+  </div>
+  <button class="mt-3 text-sm text-[#2ab39f] hover:text-[#1f8e7d] font-medium" onclick="addFaq()">+ <%= lang==='zh' ? '新增问答' : 'Add FAQ' %></button>
+</div>
+
+</form>
+</div></div>
+
+<div id="modal" class="mo" style="display:none" onclick="if(event.target===this)cm()"><div class="mb" id="mbd"></div></div>
+
+<script>
+var TK = localStorage.getItem('admin_token');
+if(!TK){ location.href='/admin'; }
+
+// Tab 切换
+document.querySelectorAll('.tp').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    document.querySelectorAll('.tp').forEach(function(b){ b.classList.remove('a'); });
+    document.querySelectorAll('.tc').forEach(function(c){ c.classList.remove('a'); });
+    btn.classList.add('a');
+    document.getElementById('c-'+btn.dataset.tab).classList.add('a');
+  });
+});
+
+// 新增规格参数行
+function addSpecRow(){
+  var tbody = document.getElementById('specs-body');
+  var tr = document.createElement('tr');
+  var idx = tbody.children.length;
+  tr.innerHTML = '<td class="text-center text-gray-400 cursor-grab">⠿</td><td><input type="text" class="fi" placeholder="<%= lang==='zh' ? '参数名称' : 'Parameter Name' %>"></td><td><input type="text" class="fi" placeholder="<%= lang==='zh' ? '参数内容' : 'Value' %>"></td><td class="text-center"><button class="text-red-400 hover:text-red-600 text-xs" onclick="this.closest(\'tr\').remove()">删除</button></td>';
+  tbody.appendChild(tr);
+}
+
+// 新增卖点
+function addHighlight(){
+  var c = document.getElementById('highlights-container');
+  var d = document.createElement('div');
+  d.className = 'block-item';
+  d.innerHTML = '<div class="flex gap-3 mb-2"><div class="flex-1"><input type="text" class="fi" placeholder="<%= lang==='zh' ? '卖点标题' : 'Title' %>"></div><div class="flex-1"><input type="text" class="fi" placeholder="<%= lang==='zh' ? '卖点说明' : 'Description' %>"></div><button class="text-gray-400 hover:text-red-500 text-xs self-center" onclick="this.parentElement.parentElement.remove()">×</button></div>';
+  c.appendChild(d);
+}
+
+// 新增 FAQ
+function addFaq(){
+  var c = document.getElementById('faq-container');
+  var d = document.createElement('div');
+  d.className = 'block-item';
+  d.innerHTML = '<div class="block-handle">⠿</div><div class="flex gap-3"><div class="flex-1"><input type="text" class="fi mb-2" placeholder="<%= lang==='zh' ? '问题' : 'Question' %>"></div><div class="flex-1"><input type="text" class="fi mb-2" placeholder="<%= lang==='zh' ? '回答' : 'Answer' %>"></div><button class="text-gray-400 hover:text-red-500 text-xs self-start mt-2" onclick="this.parentElement.parentElement.remove()">×</button></div>';
+  c.appendChild(d);
+}
+
+// 新增详情区块
+function addBlock(){
+  // 弹出区块类型选择
+  showModal('<h3 class="text-lg font-bold mb-4"><%= lang==='zh' ? '选择区块类型' : 'Select Block Type' %></h3><div class="grid grid-cols-2 gap-3"><button class="p-4 border rounded-lg hover:border-[#2ab39f] text-left" onclick="insertBlock(\'image\');cm()">📷 单图</button><button class="p-4 border rounded-lg hover:border-[#2ab39f] text-left" onclick="insertBlock(\'grid\');cm()">🔲 多图网格</button><button class="p-4 border rounded-lg hover:border-[#2ab39f] text-left" onclick="insertBlock(\'heading\');cm()">📝 标题</button><button class="p-4 border rounded-lg hover:border-[#2ab39f] text-left" onclick="insertBlock(\'text\');cm()">📄 正文段落</button><button class="p-4 border rounded-lg hover:border-[#2ab39f] text-left" onclick="insertBlock(\'image-text\');cm()">🖼 左右图文</button></div>');
+}
+
+function insertBlock(type){
+  var names = {image:'单图区块',grid:'多图网格区块',heading:'标题区块',text:'正文段落区块','image-text':'左右图文区块'};
+  var c = document.getElementById('blocks-container');
+  var d = document.createElement('div');
+  d.className = 'block-item';
+  d.innerHTML = '<div class="block-handle">⠿</div><div class="flex items-center justify-between mb-2"><span class="text-sm font-medium text-gray-700">'+names[type]+'</span><button class="text-gray-400 hover:text-red-500 text-xs" onclick="this.parentElement.parentElement.remove()">删除</button></div><div class="text-sm text-gray-400">（<%= lang==='zh' ? '点击编辑内容' : 'Click to edit' %>）</div>';
+  c.appendChild(d);
+}
+
+// 模态框
+function showModal(html){
+  document.getElementById('mbd').innerHTML = html;
+  document.getElementById('modal').style.display = 'flex';
+}
+function cm(){ document.getElementById('modal').style.display = 'none'; }
+
+// =====================================
+// 表单提交 — 收集全部 7 个 Tab 的数据
+// =====================================
+function collectFormData(){
+  var d={};
+
+  // Tab1: 基础信息
+  // title_zh - first input with maxlength=200
+  d.title_zh = document.querySelector('#c-basic input[maxlength="200"]')?.value||'';
+  // title_en - use title_zh as fallback (no separate en field in UI yet)
+  d.title_en = d.title_zh;
+  // category_id
+  var catSelect = document.querySelector('#c-basic select');
+  d.category_id = catSelect ? parseInt(catSelect.value)||0 : 0;
+  // brand
+  d.brand = document.querySelector('#c-basic input[maxlength="200"]')?.closest('.col-span-2')?.nextElementSibling?.querySelector('input')?.value || 'FULIYA';
+  if(!d.brand || d.brand==='FULIYA'){
+    // find by trying all inputs
+    var allInputs=document.querySelectorAll('#c-basic input');
+    for(var i=0;i<allInputs.length;i++){
+      if(allInputs[i].value && allInputs[i].value!=='FULIYA' && !allInputs[i].maxLength){
+        d.brand=allInputs[i].value;
+        break;
+      }
+    }
+  }
+  d.short_name = document.querySelector('#c-basic input[maxlength="20"]')?.value||'';
+  d.summary = document.querySelector('#c-basic textarea')?.value||'';
+
+  // Tab2: 规格参数
+  var specs=[];
+  document.querySelectorAll('#specs-body tr').forEach(function(tr){
+    var inputs=tr.querySelectorAll('input');
+    if(inputs.length>=2) specs.push({name:inputs[0].value,value:inputs[1].value});
+  });
+  d.specs=JSON.stringify(specs);
+
+  // Tab3: 图片与详情 - 收集主图 + 区块
+  var images=[];
+  // collect from the upload area
+  d.main_image = '';
+
+  // Blocks
+  var blocks=[];
+  var blockItems=document.querySelectorAll('#blocks-container .block-item');
+  blockItems.forEach(function(item){
+    var type=item.dataset.blockType||'text';
+    blocks.push({type:type});
+  });
+  d.blocks=JSON.stringify(blocks);
+
+  // Tab4: 卖点与标签
+  var highlights=[];
+  document.querySelectorAll('#highlights-container .block-item').forEach(function(item){
+    var inputs=item.querySelectorAll('input');
+    if(inputs.length>=2) highlights.push({title:inputs[0].value,text:inputs[1].value});
+  });
+  d.highlights=JSON.stringify(highlights);
+
+  // Tags
+  var tagsInput = document.querySelector('#c-highlights input[placeholder*=","]') ||
+                  document.querySelector('#c-highlights input[type="text"]:last-of-type');
+  if(tagsInput) d.tags=tagsInput.value;
+
+  // Tab5: SEO / URL 别名
+  // Get slug from the URL alias field (the input with the placeholder containing hyphens)
+  d.slug = '';
+  document.querySelectorAll('#c-seo input').forEach(function(el){
+    if(el.placeholder && el.placeholder.indexOf('-')>=0 && el.placeholder.indexOf('custom')>=0){
+      d.slug = el.value;
+    }
+  });
+  // SEO fields
+  var seoLabels=['seo_title','seo_desc','seo_keywords','canonical','seo_indexed','auto_alt','auto_structured'];
+  var seoInputs=document.querySelectorAll('#c-seo input, #c-seo textarea');
+  seoInputs.forEach(function(el){
+    if(el.type==='checkbox'){
+      // Determine which field this is
+      var label=el.closest('label');
+      if(label && label.textContent.indexOf('收录')>=0) d.seo_indexed=el.checked?1:0;
+      else if(label && label.textContent.indexOf('ALT')>=0) d.auto_alt=el.checked?1:0;
+      else if(label && label.textContent.indexOf('结构化')>=0) d.auto_structured=el.checked?1:0;
+    }
+  });
+
+  // Tab6: 关联推荐
+  d.recommend_title = document.querySelector('#c-related input')?.value||'Product recommendation';
+  var sel=document.querySelector('#c-related select');
+  if(sel){
+    var ids=[];
+    for(var i=0;i<sel.options.length;i++) if(sel.options[i].selected) ids.push(parseInt(sel.options[i].value));
+    d.recommends=JSON.stringify(ids);
+  }
+
+  // Tab7: FAQ
+  var faqs=[];
+  document.querySelectorAll('#faq-container .block-item').forEach(function(item){
+    var inputs=item.querySelectorAll('input');
+    if(inputs.length>=2) faqs.push({q:inputs[0].value,a:inputs[1].value});
+  });
+  d.faqs=JSON.stringify(faqs);
+  d.faq_show = document.querySelector('#c-faq input[type="checkbox"]')?.checked?1:0;
+
+  // Backward compat fields
+  d.content_zh = d.summary || '';
+  d.content_en = d.summary || '';
+  d.thumbnail = d.main_image || '';
+  d.images = '[]';
+
+  // Status from radio (convert to numeric: 1=上架, 0=下架/草稿)
+  var statusRadio=document.querySelector('input[name="status"]:checked');
+  var st = statusRadio ? statusRadio.value : 'draft';
+  d.status = st === 'published' ? 1 : 0;
+
+  return d;
+}
+
+function saveProduct(status){
+  var d=collectFormData();
+  d.status=status||d.status;
+  var isNew = !<%= product?.id ? 'true' : 'false' %>;
+  var url = isNew ? '/admin-api/products' : '/admin-api/products/<%= product?.id || '' %>';
+  var method = isNew ? 'POST' : 'PUT';
+
+  api(url, {method:method, body:d}).then(function(j){
+    if(j.code===0){
+      alert(status==='published' ? '<%= lang==='zh' ? '产品已发布！' : 'Published!' %>' : '<%= lang==='zh' ? '草稿已保存' : 'Draft saved' %>');
+      location.href='/admin/products';
+    } else {
+      alert(j.msg || '<%= lang==='zh' ? '保存失败' : 'Save failed' %>');
+    }
+  });
+}
+
+function saveDraft(){ saveProduct('draft'); }
+function publish(){ saveProduct('published'); }
+
+// API helper (using localStorage token)
+function api(url,opts){
+  if(!opts)opts={};
+  if(!opts.headers)opts.headers={};
+  opts.headers['Authorization']='Bearer '+localStorage.getItem('admin_token');
+  if(opts.body && typeof opts.body==='object'){
+    opts.body=JSON.stringify(opts.body);
+    opts.headers['Content-Type']='application/json';
+  }
+  return fetch(url,opts).then(function(r){return r.json();}).catch(function(e){return{code:-1,msg:e.message};});
+}
+</script>
+</body></html>

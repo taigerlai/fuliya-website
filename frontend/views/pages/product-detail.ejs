@@ -1,31 +1,267 @@
-<%- include('../partials/header', { config, lang, path: '/products/' + (product?.slug || '') }) %>
+<%- include('../partials/head', { config, lang }) %>
+<%- include('../partials/header', { config, lang, path: '/products' }) %>
+
+<!-- Banner -->
+<div class="banner-placeholder banner-placeholder-sm">
+  <div class="relative z-10 text-center px-4">
+    <h1 class="text-3xl md:text-4xl font-bold text-white"><%= lang==='zh' ? '产品详情' : 'Product Detail' %></h1>
+  </div>
+</div>
+
+<!-- 面包屑导航 Breadcrumb - M1 -->
+<div class="max-w-7xl mx-auto px-4 pt-6">
+  <nav class="text-sm text-gray-500 flex items-center gap-2">
+    <a href="/" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '首页' : 'Home' %></a>
+    <span>/</span>
+    <% if (product?.category) { %>
+      <a href="/products?category_id=<%= product.category.id %>" class="hover:text-[#2ab39f]"><%= lang==='zh' ? product.category.name_zh : product.category.name_en %></a>
+      <span>/</span>
+    <% } %>
+    <span class="text-[#2ab39f] font-medium"><%= lang==='zh' ? product.title_zh : product.title_en %></span>
+  </nav>
+  <!-- [GEO] BreadcrumbList 结构化数据自动生成 -->
+</div>
+
+<!-- M2: 首屏核心区 -->
 <div class="max-w-7xl mx-auto px-4 py-8">
-  <nav class="text-sm text-gray-500 mb-6 flex items-center gap-2"><a href="/" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '首页' : 'Home' %></a><span>/</span><a href="/products" class="hover:text-[#2ab39f]"><%= lang==='zh' ? '产品中心' : 'Products' %></a><span>/</span><span class="text-[#2ab39f] font-medium"><%= lang==='zh' ? product?.title_zh : product?.title_en %></span></nav>
-  <div class="flex flex-col lg:flex-row gap-10">
-    <div class="lg:w-1/2">
-      <div class="h-96 rounded-2xl bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400"><%= lang==='zh' ? '产品主图' : 'Product Image' %></div>
-      <% if (product?.images && product.images.length) { %>
-      <div class="grid grid-cols-4 gap-3 mt-4"><% product.images.forEach(img => { %><div class="h-20 rounded-lg bg-gray-100"></div><% }) %></div>
-      <% } %>
+  <div class="flex flex-col lg:flex-row gap-8">
+    <!-- 左侧：主图轮播 -->
+    <div class="lg:w-[55%]">
+      <div class="relative w-full h-[500px] bg-gray-100 rounded-xl overflow-hidden">
+        <% if (product?.main_image) { %>
+          <img src="<%= product.main_image %>" alt="<%= product.brand || 'FULIYA' %> <%= lang==='zh' ? product.title_zh : product.title_en %>" class="w-full h-full object-cover">
+        <% } else { %>
+          <div class="w-full h-full flex items-center justify-center text-gray-400"><%= lang==='zh' ? '产品主图' : 'Product Image' %></div>
+        <% } %>
+      </div>
+      <!-- 缩略图列表 -->
+      <div class="flex gap-2.5 mt-2.5 overflow-x-auto">
+        <% if (product?.images && product.images.length) { %>
+          <% product.images.forEach((img, i) => { %>
+            <div class="w-20 h-20 rounded-lg border-2 <%= i===0 ? 'border-[#2ab39f]' : 'border-gray-200' %> overflow-hidden flex-shrink-0 cursor-pointer">
+              <img src="<%= img.url %>" alt="<%= img.alt || (product.brand+' '+product.title_en) %>" class="w-full h-full object-cover">
+            </div>
+          <% }) %>
+        <% } else { %>
+          <% for(let i=0;i<4;i++){ %>
+            <div class="w-20 h-20 rounded-lg border-2 border-gray-200 bg-gray-50 flex items-center justify-center text-xs text-gray-400 flex-shrink-0"><%= i+1 %></div>
+          <% } %>
+        <% } %>
+      </div>
     </div>
-    <div class="lg:w-1/2">
-      <h1 class="text-2xl md:text-3xl font-bold mb-2"><%= lang==='zh' ? product?.title_zh : product?.title_en %></h1>
-      <table class="w-full border-collapse mb-6 mt-6">
-        <tbody>
-          <% if (product?.specs) { Object.entries(product.specs).forEach(([k,v]) => { %>
-          <tr class="border-b border-gray-100"><td class="py-2.5 text-sm text-gray-500 w-36"><%= k %></td><td class="py-2.5 text-sm font-medium"><%= v %></td></tr>
-          <% }) } %>
-          <% if (product?.moq) { %><tr class="border-b border-gray-100"><td class="py-2.5 text-sm text-gray-500">MOQ</td><td class="py-2.5 text-sm font-medium"><%= product.moq %></td></tr><% } %>
-        </tbody>
-      </table>
-      <a href="/contact" class="inline-block bg-[#2ab39f] text-white px-8 py-3 rounded-lg font-semibold hover:bg-[#1f8e7d] transition"><%= lang==='zh' ? '立即询价' : 'Inquire Now' %></a>
+
+    <!-- 右侧：产品信息栏 -->
+    <div class="lg:w-[40%]">
+      <!-- H1 产品标题 -->
+      <h1 class="text-[28px] font-bold text-[#333] leading-tight mb-4">
+        <%= lang==='zh' ? product.title_zh : product.title_en %>
+      </h1>
+
+      <!-- 品牌 -->
+      <div class="flex items-center gap-2 mb-4">
+        <span class="text-sm text-gray-500"><%= lang==='zh' ? '品牌' : 'Brand' %>:</span>
+        <span class="font-semibold text-gray-800"><%= product?.brand || 'FULIYA' %></span>
+      </div>
+
+      <!-- 基础简介 -->
+      <p class="text-base text-gray-600 leading-relaxed mb-6">
+        <%= product?.summary || (lang==='zh' ? '高品质环保包袋，支持 OEM/ODM 定制' : 'High quality eco bags, OEM/ODM supported') %>
+      </p>
+
+      <!-- Description 参数列表 -->
+      <div class="mb-6">
+        <span class="font-bold text-gray-800"><%= lang==='zh' ? '参数' : 'Description' %>:</span>
+        <div class="mt-2 space-y-1 text-base text-gray-600 leading-relaxed">
+          <% if (product?.params && product.params.length) { %>
+            <% product.params.forEach(p => { %>
+              <div><span class="font-medium"><%= p.name %>:</span> <%= p.value %></div>
+            <% }) %>
+          <% } else { %>
+            <div><span class="font-medium">Type:</span> Backpack</div>
+            <div><span class="font-medium">Size:</span> W31*D15*H43cm</div>
+            <div><span class="font-medium">Material:</span> Oxford fabric</div>
+          <% } %>
+        </div>
+      </div>
+
+      <!-- 询价操作区 -->
+      <div class="mb-4">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="text-sm text-gray-600"><%= lang==='zh' ? '数量' : 'Qty' %>:</span>
+          <div class="flex items-center border border-gray-300 rounded">
+            <button class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-lg">-</button>
+            <input type="number" value="1" min="1" class="w-16 h-10 text-center border-x border-gray-300 text-sm outline-none">
+            <button class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-100 text-lg">+</button>
+          </div>
+        </div>
+        <!-- ADD TO INQUIRY 主按钮 -->
+        <button class="w-full h-12 bg-[#2ab39f] text-white font-semibold rounded hover:bg-[#1f8e7d] transition text-base mb-3">
+          <%= lang==='zh' ? '加入询价' : 'ADD TO INQUIRY' %>
+        </button>
+        <!-- 三个功能按钮 -->
+        <div class="grid grid-cols-3 gap-2.5">
+          <a href="mailto:<%= config?.email || 'info@fuliya.com' %>?subject=<%= encodeURIComponent(product.title_en || 'Product Inquiry') %>" class="flex items-center justify-center h-11 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 transition"><%= lang==='zh' ? '邮件' : 'Email' %></a>
+          <button class="flex items-center justify-center h-11 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 transition"><%= lang==='zh' ? '联系' : 'Contact' %></button>
+          <button class="flex items-center justify-center h-11 border border-gray-300 rounded text-sm text-gray-600 hover:bg-gray-50 transition">PDF</button>
+        </div>
+      </div>
     </div>
   </div>
-  <% if (product?.content_zh || product?.content_en) { %>
-  <section class="mt-16">
-    <h2 class="text-xl font-bold mb-6"><%= lang==='zh' ? '产品描述' : 'Description' %></h2>
-    <div class="text-gray-600 leading-relaxed"><%= lang==='zh' ? product.content_zh : product.content_en %></div>
-  </section>
+</div>
+
+<!-- M3: 规格参数 Product Parameters -->
+<div class="max-w-7xl mx-auto px-4 pb-8">
+  <h2 class="bg-[#2ab39f] text-white text-center text-xl font-bold h-[50px] leading-[50px] rounded-t-lg">Product Parameters</h2>
+  <table class="w-full border border-gray-200 rounded-b-lg overflow-hidden">
+    <tbody>
+      <% if (product?.specs && product.specs.length) { %>
+        <% product.specs.forEach((s, i) => { %>
+          <tr class="<%= i%2===0 ? 'bg-gray-50' : 'bg-white' %>">
+            <td class="w-[25%] px-4 py-[10px] text-sm font-semibold text-[#333] border-b border-gray-200"><%= s.name %></td>
+            <td class="w-[75%] px-4 py-[10px] text-sm text-gray-700 border-b border-gray-200"><%= s.value %></td>
+          </tr>
+        <% }) %>
+      <% } else { %>
+        <tr class="bg-gray-50"><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">Material 材质</td><td class="px-4 py-[10px] text-sm border-b">Oxford, customized</td></tr>
+        <tr><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">Size 尺寸</td><td class="px-4 py-[10px] text-sm border-b">W31*D15*H43cm, Customized</td></tr>
+        <tr class="bg-gray-50"><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">Color 颜色</td><td class="px-4 py-[10px] text-sm border-b">Black, Gray, Customized</td></tr>
+        <tr><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">MOQ 起订量</td><td class="px-4 py-[10px] text-sm border-b">500pcs/style</td></tr>
+        <tr class="bg-gray-50"><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">Sample Lead Time 样品周期</td><td class="px-4 py-[10px] text-sm border-b">7-10days</td></tr>
+        <tr><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">Bulk Lead Time 大货周期</td><td class="px-4 py-[10px] text-sm border-b">Usually 30-40 days</td></tr>
+        <tr class="bg-gray-50"><td class="w-[25%] px-4 py-[10px] text-sm font-semibold border-b">Packing 包装</td><td class="px-4 py-[10px] text-sm border-b">PE bag + carton</td></tr>
+      <% } %>
+    </tbody>
+  </table>
+  <!-- [GEO] Product structured数据additionalProperty自动注入 -->
+</div>
+
+<!-- M4: 详情图文动态渲染区 -->
+<div class="max-w-7xl mx-auto px-4 pb-8">
+  <% if (product?.blocks && product.blocks.length) { %>
+    <% product.blocks.forEach(b => { %>
+      <% if (b.type === 'image') { %>
+        <div class="mb-5">
+          <img src="<%= b.url %>" alt="<%= b.alt || (product.brand+' '+product.title_en) %>" class="w-full rounded-lg" loading="lazy">
+          <% if (b.caption) { %><p class="text-center text-sm text-gray-500 mt-2"><%= b.caption %></p><% } %>
+        </div>
+      <% } else if (b.type === 'grid') { %>
+        <div class="grid grid-cols-1 <%= b.layout==='4' ? 'md:grid-cols-4' : 'md:grid-cols-2' %> gap-5 mb-5">
+          <% (b.images || []).forEach(img => { %>
+            <div><img src="<%= img.url %>" alt="<%= img.alt %>" class="w-full rounded-lg" loading="lazy"><% if (img.caption) { %><p class="text-center text-sm text-gray-500 mt-2"><%= img.caption %></p><% } %></div>
+          <% }) %>
+        </div>
+      <% } else if (b.type === 'heading') { %>
+        <%= b.level === 'h2' ? '<h2 class="text-[22px] font-bold text-[#333] mb-5 mt-5">'+b.text+'</h2>' : '<h3 class="text-[18px] font-bold text-[#333] mb-4 mt-4">'+b.text+'</h3>' %>
+      <% } else if (b.type === 'text') { %>
+        <div class="text-base text-gray-700 leading-relaxed mb-5"><%- b.html %></div>
+      <% } else if (b.type === 'image-text') { %>
+        <div class="flex flex-col md:flex-row gap-[5%] mb-5 items-center">
+          <% if (b.direction === 'image-left') { %>
+            <div class="md:w-[50%]"><img src="<%= b.url %>" alt="<%= b.alt %>" class="w-full rounded-lg" loading="lazy"></div>
+            <div class="md:w-[45%] text-base text-gray-700 leading-relaxed"><%= b.text %></div>
+          <% } else { %>
+            <div class="md:w-[45%] text-base text-gray-700 leading-relaxed"><%= b.text %></div>
+            <div class="md:w-[50%]"><img src="<%= b.url %>" alt="<%= b.alt %>" class="w-full rounded-lg" loading="lazy"></div>
+          <% } %>
+        </div>
+      <% } %>
+    <% }) %>
+  <% } else { %>
+    <!-- 默认占位图文 -->
+    <div class="mb-5"><div class="w-full h-[400px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg flex items-center justify-center text-gray-400"><%= lang==='zh' ? '产品详情图（请在后台上传）' : 'Product detail image (upload in admin)' %></div></div>
+    <div class="mb-5"><div class="grid grid-cols-1 md:grid-cols-2 gap-5"><div class="h-[300px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg"></div><div class="h-[300px] bg-gradient-to-br from-gray-100 to-gray-200 rounded-lg"></div></div></div>
   <% } %>
 </div>
+
+<!-- M5: 核心卖点 Quick Details -->
+<div class="max-w-7xl mx-auto px-4 pb-8">
+  <h2 class="bg-[#2ab39f] text-white text-center text-xl font-bold h-[50px] leading-[50px] rounded-t-lg">Quick Details</h2>
+  <div class="border border-gray-200 border-t-0 rounded-b-lg p-6">
+    <% if (product?.highlights && product.highlights.length) { %>
+      <% product.highlights.forEach(h => { %>
+        <div class="text-base text-[#333] leading-[2]"><strong><%= h.title %>:</strong> <%= h.text %></div>
+      <% }) %>
+    <% } else { %>
+      <div class="text-base text-[#333] leading-[2]"><strong>Best For:</strong> Students, business travelers</div>
+      <div class="text-base text-[#333] leading-[2]"><strong>Use Cases:</strong> Travel, Work, School, Business Trip</div>
+      <div class="text-base text-[#333] leading-[2]"><strong>Large Main Compartment:</strong> Fits 15.6" laptop, books, clothes</div>
+      <div class="text-base text-[#333] leading-[2]"><strong>Multi-Compartment:</strong> Multiple pockets for organized storage</div>
+      <div class="text-base text-[#333] leading-[2]"><strong>Water-resistant Fabric:</strong> Durable Oxford material</div>
+      <div class="text-base text-[#333] leading-[2]"><strong>Breathable Strap:</strong> Ergonomic padded shoulder strap</div>
+      <div class="text-base text-[#333] leading-[2]"><strong>Custom Service:</strong> LOGO, color, size customization</div>
+    <% } %>
+    <!-- Tags -->
+    <div class="mt-4 pt-4 border-t border-gray-200 text-sm text-gray-500">
+      <strong>Tags:</strong>
+      <% if (product?.tags && product.tags.length) { %>
+        <%= product.tags.join(', ') %>
+      <% } else { %>
+        laptop backpack, travel backpack, custom backpack, oxford backpack
+      <% } %>
+    </div>
+  </div>
+  <!-- [GEO] 核心卖点长尾关键词自然布局 -->
+</div>
+
+<!-- M6: FAQ 问答模块 -->
+<div class="max-w-7xl mx-auto px-4 pb-8">
+  <h2 class="text-[22px] font-bold text-[#333] mb-6">Frequently Asked Questions</h2>
+  <div class="space-y-3">
+    <% if (product?.faqs && product.faqs.length) { %>
+      <% product.faqs.forEach((faq, i) => { %>
+        <details class="border border-gray-200 rounded-lg overflow-hidden <%= i>0 ? '' : '' %>">
+          <summary class="h-12 px-4 flex items-center justify-between bg-gray-50 cursor-pointer font-semibold text-sm text-[#333]"><%= faq.q %><span class="text-gray-400 text-lg">▼</span></summary>
+          <div class="px-4 py-4 text-sm text-gray-600 leading-relaxed bg-white"><%= faq.a %></div>
+        </details>
+      <% }) %>
+    <% } else { %>
+      <details class="border border-gray-200 rounded-lg overflow-hidden" open>
+        <summary class="h-12 px-4 flex items-center justify-between bg-gray-50 cursor-pointer font-semibold text-sm text-[#333]">What is the MOQ for custom backpack?<span class="text-gray-400 text-lg">▼</span></summary>
+        <div class="px-4 py-4 text-sm text-gray-600 leading-relaxed bg-white">The MOQ is 500pcs per style. For new clients, we can accept 300pcs for trial order.</div>
+      </details>
+      <details class="border border-gray-200 rounded-lg overflow-hidden">
+        <summary class="h-12 px-4 flex items-center justify-between bg-gray-50 cursor-pointer font-semibold text-sm text-[#333]">How long is the sample lead time?<span class="text-gray-400 text-lg">▼</span></summary>
+        <div class="px-4 py-4 text-sm text-gray-600 leading-relaxed bg-white">Sample lead time is 7-10 days. Rush service available within 3-5 days.</div>
+      </details>
+      <details class="border border-gray-200 rounded-lg overflow-hidden">
+        <summary class="h-12 px-4 flex items-center justify-between bg-gray-50 cursor-pointer font-semibold text-sm text-[#333]">Can I print my own logo on the backpack?<span class="text-gray-400 text-lg">▼</span></summary>
+        <div class="px-4 py-4 text-sm text-gray-600 leading-relaxed bg-white">Yes, we support silkscreen printing, heat transfer, embroidery, and woven labels.</div>
+      </details>
+      <details class="border border-gray-200 rounded-lg overflow-hidden">
+        <summary class="h-12 px-4 flex items-center justify-between bg-gray-50 cursor-pointer font-semibold text-sm text-[#333]">Is this backpack water resistant?<span class="text-gray-400 text-lg">▼</span></summary>
+        <div class="px-4 py-4 text-sm text-gray-600 leading-relaxed bg-white">Yes, the Oxford fabric is water resistant and durable for daily use.</div>
+      </details>
+    <% } %>
+  </div>
+  <!-- [GEO] FAQPage 结构化数据自动生成 -->
+</div>
+
+<!-- M7: 关联产品推荐 Product Recommendation -->
+<div class="max-w-7xl mx-auto px-4 pb-8">
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-[22px] font-bold text-[#333]"><%= product?.recommend_title || 'Product recommendation' %></h2>
+    <div class="flex gap-2">
+      <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-100 text-sm">‹</button>
+      <button class="w-9 h-9 rounded-full border border-gray-300 flex items-center justify-center text-gray-500 hover:bg-gray-100 text-sm">›</button>
+    </div>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <% if (product?.recommends && product.recommends.length) { %>
+      <% product.recommends.forEach(r => { %>
+        <a href="/products/<%= r.slug %>" class="product-card">
+          <div class="h-[200px] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm"><%= lang==='zh' ? '产品图片' : 'Image' %></div>
+          <div class="p-3"><h3 class="text-sm font-semibold text-[#333] truncate"><%= lang==='zh' ? r.title_zh : r.title_en %></h3></div>
+        </a>
+      <% }) %>
+    <% } else { %>
+      <% for(let i=1;i<=4;i++){ %>
+        <a href="#" class="product-card">
+          <div class="h-[200px] bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center text-gray-400 text-sm"><%= lang==='zh' ? '推荐产品' : 'Product' %> <%= i %></div>
+          <div class="p-3"><h3 class="text-sm font-semibold text-[#333] truncate"><%= lang==='zh' ? '同类产品' : 'Related Product' %> <%= i %></h3></div>
+        </a>
+      <% } %>
+    <% } %>
+  </div>
+</div>
+
 <%- include('../partials/footer', { config, lang }) %>

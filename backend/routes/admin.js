@@ -58,22 +58,100 @@ router.get('/products', async (req, res) => {
 });
 
 router.post('/products', async (req, res) => {
-  const { title_zh, title_en, slug, category_id, content_zh, content_en, specs, moq } = req.body;
+  const { title_zh, title_en, slug, category_id, content_zh, content_en, specs, moq,
+    brand, short_name, summary, highlights, blocks, faqs, faq_show,
+    seo_title, seo_desc, seo_keywords, canonical, seo_indexed, auto_alt, auto_structured,
+    recommend_title, recommends, tags, main_image, thumbnail, images, status } = req.body;
   if (!title_zh || !title_en) return res.json(fail('标题必填'));
   await pool.query(
-    'INSERT INTO products (title_zh,title_en,slug,category_id,content_zh,content_en,specs,moq) VALUES (?,?,?,?,?,?,?,?)',
-    [title_zh, title_en, slug || '', category_id || 0, content_zh || '', content_en || '', specs || '{}', moq || '']
+    `INSERT INTO products 
+     (title_zh,title_en,slug,category_id,content_zh,content_en,specs,moq,
+      brand,short_name,summary,highlights,blocks,faqs,faq_show,
+      seo_title,seo_desc,seo_keywords,canonical,seo_indexed,auto_alt,auto_structured,
+      recommend_title,recommends,tags,main_image,thumbnail,images,status)
+     VALUES (?,?,?,?,?,?,?,?,
+             ?,?,?,?,?,?,?,
+             ?,?,?,?,?,?,?,
+             ?,?,?,?,?,?,?,?)`,
+    [title_zh, title_en, slug || '', category_id || 0, content_zh || '', content_en || '',
+     typeof specs==='string'?specs:JSON.stringify(specs||{}), moq || '',
+     brand||'FULIYA', short_name||'', summary||'',
+     typeof highlights==='string'?highlights:JSON.stringify(highlights||[]),
+     typeof blocks==='string'?blocks:JSON.stringify(blocks||[]),
+     typeof faqs==='string'?faqs:JSON.stringify(faqs||[]),
+     faq_show??0,
+     seo_title||'', seo_desc||'', seo_keywords||'', canonical||'',
+     seo_indexed??1, auto_alt??1, auto_structured??1,
+     recommend_title||'', typeof recommends==='string'?recommends:JSON.stringify(recommends||[]),
+     tags||'', main_image||'', thumbnail||'',
+     typeof images==='string'?images:JSON.stringify(images||[]),
+     status??1]
   );
   res.json(success(null, '添加成功'));
 });
 
 router.put('/products/:id', async (req, res) => {
-  const { title_zh, title_en, slug, category_id, content_zh, content_en, specs, moq, status } = req.body;
+  const { title_zh, title_en, slug, category_id, content_zh, content_en, specs, moq,
+    brand, short_name, summary, highlights, blocks, faqs, faq_show,
+    seo_title, seo_desc, seo_keywords, canonical, seo_indexed, auto_alt, auto_structured,
+    recommend_title, recommends, tags, main_image, thumbnail, images, status } = req.body;
   await pool.query(
-    'UPDATE products SET title_zh=?,title_en=?,slug=?,category_id=?,content_zh=?,content_en=?,specs=?,moq=?,status=? WHERE id=?',
-    [title_zh, title_en, slug, category_id, content_zh, content_en, specs, moq, status ?? 1, req.params.id]
+    `UPDATE products SET
+     title_zh=?, title_en=?, slug=?, category_id=?, content_zh=?, content_en=?,
+     specs=?, moq=?, brand=?, short_name=?, summary=?,
+     highlights=?, blocks=?, faqs=?, faq_show=?,
+     seo_title=?, seo_desc=?, seo_keywords=?, canonical=?,
+     seo_indexed=?, auto_alt=?, auto_structured=?,
+     recommend_title=?, recommends=?, tags=?, main_image=?, thumbnail=?, images=?,
+     status=?
+     WHERE id=?`,
+    [title_zh, title_en, slug, category_id, content_zh, content_en,
+     typeof specs==='string'?specs:JSON.stringify(specs||{}), moq,
+     brand, short_name, summary,
+     typeof highlights==='string'?highlights:JSON.stringify(highlights||[]),
+     typeof blocks==='string'?blocks:JSON.stringify(blocks||[]),
+     typeof faqs==='string'?faqs:JSON.stringify(faqs||[]),
+     faq_show,
+     seo_title, seo_desc, seo_keywords, canonical,
+     seo_indexed, auto_alt, auto_structured,
+     recommend_title,
+     typeof recommends==='string'?recommends:JSON.stringify(recommends||[]),
+     tags, main_image, thumbnail,
+     typeof images==='string'?images:JSON.stringify(images||[]),
+     status ?? 1, req.params.id]
   );
   res.json(success(null, '更新成功'));
+});
+
+// GET /admin/products/:id - Get single product for edit
+router.get('/products/:id', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM products WHERE id=?', [req.params.id]);
+    if (!rows.length) return res.json(fail('产品不存在'));
+    const p = rows[0];
+    // Parse JSON fields
+    if (p.images && typeof p.images === 'string') p.images = JSON.parse(p.images);
+    if (p.specs && typeof p.specs === 'string') p.specs = JSON.parse(p.specs);
+    if (p.highlights && typeof p.highlights === 'string') p.highlights = JSON.parse(p.highlights);
+    if (p.blocks && typeof p.blocks === 'string') p.blocks = JSON.parse(p.blocks);
+    if (p.faqs && typeof p.faqs === 'string') p.faqs = JSON.parse(p.faqs);
+    if (p.recommends && typeof p.recommends === 'string') p.recommends = JSON.parse(p.recommends);
+    if (p.tags && typeof p.tags === 'string') p.tags = p.tags.split(',').filter(Boolean);
+    if (p.seo_keywords && typeof p.seo_keywords === 'string') p.seo_keywords = p.seo_keywords.split(',').filter(Boolean);
+    res.json(success(p));
+  } catch (e) {
+    res.json(fail(e.message));
+  }
+});
+
+// GET /admin/products/list - Get all products for selector
+router.get('/products/list/all', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT id, title_zh, title_en, slug, thumbnail FROM products ORDER BY id DESC');
+    res.json(success(rows));
+  } catch (e) {
+    res.json(fail(e.message));
+  }
 });
 
 router.delete('/products/:id', async (req, res) => {
@@ -173,15 +251,19 @@ router.put('/config', async (req, res) => {
 
 // === SECTIONS ===
 router.get('/sections', async (req, res) => {
-  const [rows] = await pool.query('SELECT * FROM page_sections ORDER BY page_name, sort');
+  const page = req.query.page || '';
+  let where = 'WHERE 1=1';
+  const params = [];
+  if (page) { where += ' AND page_name=?'; params.push(page); }
+  const [rows] = await pool.query(`SELECT * FROM page_sections ${where} ORDER BY page_name, sort`, params);
   res.json(success(rows));
 });
 
 router.put('/sections/:id', async (req, res) => {
-  const { content_zh, content_en, image_url, image_alt_zh, image_alt_en, status } = req.body;
+  const { content_zh, content_en, image_url, image_alt_zh, image_alt_en, sort, status } = req.body;
   await pool.query(
-    'UPDATE page_sections SET content_zh=?,content_en=?,image_url=?,image_alt_zh=?,image_alt_en=?,status=? WHERE id=?',
-    [content_zh, content_en, image_url, image_alt_zh, image_alt_en, status ?? 1, req.params.id]
+    'UPDATE page_sections SET content_zh=?,content_en=?,image_url=?,image_alt_zh=?,image_alt_en=?,sort=?,status=? WHERE id=?',
+    [content_zh, content_en, image_url, image_alt_zh, image_alt_en, sort??0, status ?? 1, req.params.id]
   );
   res.json(success(null, '保存成功'));
 });
