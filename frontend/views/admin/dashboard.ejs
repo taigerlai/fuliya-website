@@ -57,7 +57,6 @@ async function api(url,opts){
     }
     return j;
   }catch(e){
-    $('pc').innerHTML='<div class="bg-red-50 border border-red-200 p-6 rounded-xl"><h2 class="font-bold text-red-700">连接错误</h2><p class="text-sm text-red-600 mt-2">'+h(e.message)+'</p></div>';
     return{code:-1,msg:e.message,data:null};
   }
 }
@@ -92,7 +91,7 @@ function sw(p){
 
 async function getDashboard(){
   var d=await api('/admin-api/dashboard');
-  if(!d.data)return;
+  if(!d.data){ $('pc').innerHTML='<div class="text-center py-10 text-gray-400">⚠️ 数据加载失败，请重试</div>'; return; }
   var s=d.data;
   var h='<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">';
   h+=card('产品总数',s.products);
@@ -271,8 +270,13 @@ async function _renderModules(pg){
   var defs = _pageSectionDefs[pg] || [];
   if(!defs.length){ container.innerHTML='<div class="text-center py-10 text-gray-400">暂无可编辑的板块</div>'; return; }
 
-  // Fetch DB data
-  var d = await api('/admin-api/sections?page='+pg);
+  // Fetch DB data with timeout fallback
+  var d = await Promise.race([
+    api('/admin-api/sections?page='+pg),
+    new Promise(function(resolve){
+      setTimeout(function(){ resolve({code:-1,msg:'timeout',data:[]}); }, 6000);
+    })
+  ]);
   var dbData = d.data || [];
   function findByKey(k){ for(var i=0;i<dbData.length;i++){ if(dbData[i].section_key===k) return dbData[i]; } return null; }
 
