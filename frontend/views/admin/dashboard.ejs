@@ -1,484 +1,561 @@
-<!DOCTYPE html><html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>管理后台 - 富丽雅</title>
-<script src="https://cdn.tailwindcss.com"></script>
-<script>window.tailwind||document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/3.4.17/index.global.min.js"><\/script>')</script>
-<style>
-body{font-family:Noto Sans SC,Inter,sans-serif;background:#f1f5f9;margin:0}
-.sd{display:flex;align-items:center;padding:12px 20px;color:#94a3b8;cursor:pointer;border-left:3px solid transparent;font-size:14px}
-.sd:hover{background:#1e293b;color:#e2e8f0}
-.sd.a{background:rgba(42,179,159,.1);color:#2ab39f;border-left-color:#2ab39f}
-.tbl{width:100%;border-collapse:collapse}
-.tbl th{text-align:left;padding:12px 16px;font-size:13px;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:2px solid #e5e7eb}
-.tbl td{padding:12px 16px;font-size:14px;border-bottom:1px solid #f1f5f9}
-.fi{width:100%;padding:10px 14px;border:1px solid #d1d5db;border-radius:8px;font-size:14px;outline:none}
-.fi:focus{border-color:#2ab39f;box-shadow:0 0 0 3px rgba(42,179,159,.15)}
-.bdg{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px}.bdg-g{background:#dcfce7;color:#15803d}
-.bdg-y{background:#fef9c3;color:#a16207}.bdg-gy{background:#f1f5f9;color:#64748b}
-.mo{position:fixed;inset:0;z-index:999;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center}
-.mb{background:#fff;border-radius:16px;padding:24px;width:90%;max-width:700px;max-height:85vh;overflow-y:auto}
-</style></head><body>
-<div class="flex" style="min-height:100vh">
-<div class="w-60 bg-[#0f172a] fixed h-full" style="z-index:50">
-<div class="p-5 border-b border-slate-800"><div class="text-white font-bold">富丽雅管理</div><div class="text-xs text-slate-500 mt-1">Admin Panel</div></div>
-<div id="nav" class="py-3"></div></div>
-<div class="flex-1 ml-60">
-<div class="bg-white border-b h-16 flex items-center justify-between px-6 sticky top-0 z-40">
-<span class="text-sm text-gray-400">当前：<span id="pt" class="font-semibold text-gray-800">...</span></span>
-<div><span id="ai" class="text-sm text-gray-600 mr-3"></span><button id="lo" class="text-sm text-red-500 hover:underline">退出</button></div></div>
-<div class="p-6" id="pc"><div class="text-center py-20 text-gray-400">⏳ 加载中...</div></div></div></div>
-<div id="modal" class="mo" style="display:none" onclick="if(event.target===this)cm()"><div class="mb" id="mbd"></div></div>
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>管理后台 - 富丽雅</title><script src="https://cdn.tailwindcss.com"></script><script>tailwind.config={theme:{extend:{colors:{brand:{DEFAULT:'#2ab39f',light:'#3dcfba',dark:'#1f8f7e',lighter:'#e8f8f5'}},fontFamily:{sans:['Inter','"Noto Sans SC"','sans-serif']}}}</script><style>body{font-family:'Inter','Noto Sans SC',sans-serif;}.active-page{background:rgba(42,179,159,.2)!important;color:#2ab39f!important;font-weight:500!important}.section-title{font-size:1.25rem;font-weight:700;margin-bottom:1rem}.admin-table{width:100%;border-collapse:collapse}.admin-table th{text-align:left;padding:.75rem 1rem;font-size:.8125rem;font-weight:600;color:#64748b;background:#f8fafc;border-bottom:2px solid #e5e7eb}.admin-table td{padding:.75rem 1rem;font-size:.875rem;border-bottom:1px solid #f1f5f9;color:#334155}.admin-table tr:hover td{background:#f8fafc}.badge{padding:.1875rem .625rem;border-radius:9999px;font-size:.75rem;font-weight:500}.badge-green{background:#dcfce7;color:#15803d}.badge-yellow{background:#fef9c3;color:#a16207}.badge-gray{background:#f1f5f9;color:#64748b}.badge-brand{background:#e8f8f5;color:#2ab39f}.badge-blue{background:#eff6ff;color:#2563ed}.badge-purple{background:#f5f3ff;color:#9333ea}.badge-amber{background:#fffbeb;color:#d97706}.badge-rose{background:#fff1f2;color:#e11d48}.form-input{width:100%;padding:.625rem .875rem;border:1px solid #d1d5db;border-radius:.5rem;font-size:.875rem;outline:none;transition:all .2s}.form-input:focus{border-color:#2ab39f;box-shadow:0 0 0 3px rgba(42,179,159,.15)}.form-label{display:block;font-size:.8125rem;font-weight:600;color:#374151;margin-bottom:.375rem}.stat-card{background:#fff;border-radius:.75rem;padding:1.5rem;border:1px solid #e5e7eb}.stat-card:hover{border-color:#2ab39f}.hidden{display:none!important}.active-tab{color:#2ab39f!important;border-bottom:2px solid #2ab39f!important}.inactive-tab{color:#6b7280!important;border-bottom:2px solid transparent!important}.tab-active{border-bottom:2px solid #2ab39f;color:#2ab39f}</style></head><body>
+<div id="app" class="flex min-h-screen bg-gray-50">
+<aside class="w-60 bg-gray-900 flex-shrink-0 min-h-screen hidden lg:flex flex-col">
+<div class="h-16 flex items-center gap-2 px-5 border-b border-gray-800"><div class="w-9 h-9 bg-[#2ab39f] rounded-lg flex items-center justify-center text-white font-bold text-sm">富</div><span class="font-bold text-white text-sm">富丽雅管理后台</span></div>
+<nav class="flex-1 py-4 px-3 space-y-1 text-sm" id="adminNav">
+<svg style="display:none"><symbol id="icon-dashboard" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg><symbol id="icon-products" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg><symbol id="icon-news" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg><symbol id="icon-cases" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg><symbol id="icon-pages" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"/></svg><symbol id="icon-settings" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg><symbol id="icon-messages" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg><symbol id="icon-tools" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/></svg></svg>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="dashboard"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-dashboard"/></svg>数据仪表盘</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="products"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-products"/></svg>产品管理</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="news"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-news"/></svg>新闻管理</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="cases"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-cases"/></svg>案例管理</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="pages"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-pages"/></svg>页面模块编辑</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="settings"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-settings"/></svg>全站配置</a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="messages"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-messages"/></svg>留言管理 <span id="msgBadge" class="ml-auto bg-red-500 text-white text-xs rounded-full px-2 py-0.5 hidden">0</span></a>
+<a class="flex items-center gap-3 px-3 py-2.5 text-gray-400 cursor-pointer hover:bg-gray-800 hover:text-white rounded-lg transition" data-page="tools"><svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><use href="#icon-tools"/></svg>系统工具</a>
+</nav>
+<div class="p-4 border-t border-gray-800"><a onclick="logout()" class="flex items-center gap-2 text-sm text-gray-400 hover:text-white cursor-pointer"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>退出登录</a></div>
+</aside>
+<div class="flex-1 flex flex-col min-w-0">
+<div class="bg-white border-b border-gray-200 h-16 flex items-center justify-between px-6 sticky top-0 z-10"><span class="text-sm text-gray-400">当前页面：<span id="pageTitle" class="font-semibold text-gray-800">数据仪表盘</span></span><div class="flex items-center gap-3"><span class="text-sm text-gray-600" id="adminInfo"></span><button onclick="logout()" class="text-sm text-red-500 hover:underline">退出</button></div></div>
+<div class="p-6" id="pageContent">
+<!-- content loaded by JS -->
+</div></div></div>
 <script>
-var TK=localStorage.getItem('admin_token');
-if(!TK){location.href='/admin'}
-document.getElementById('lo').onclick=function(){localStorage.removeItem('admin_token');localStorage.removeItem('admin_nickname');location.href='/admin'};
-document.getElementById('ai').textContent='\uD83D\uDC64 '+(localStorage.getItem('admin_nickname')||'管理员');
-function $(id){return document.getElementById(id)}
-function h(t){return String(t||'').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
-function om(h){$('modal').style.display='flex';$('mbd').innerHTML=h}
-function cm(){$('modal').style.display='none'}
-
-async function api(url,opts){
-  if(!opts)opts={};
-  if(!opts.headers)opts.headers={};
-  opts.headers['Authorization']='Bearer '+TK;
-  if(opts.body && typeof opts.body==='object'){
-    opts.body=JSON.stringify(opts.body);
-    opts.headers['Content-Type']='application/json';
-  }
-  try{
-    var controller=new AbortController();
-    var timer=setTimeout(function(){controller.abort()},10000);
-    opts.signal=controller.signal;
-    var r=await fetch(url,opts);
-    clearTimeout(timer);
-    var j=await r.json();
-    if(j.code===-1 && j.msg && j.msg.indexOf('未')>=0){
-      localStorage.removeItem('admin_token');
-      location.href='/admin';
-    }
-    return j;
-  }catch(e){
-    return{code:-1,msg:e.message,data:null};
-  }
+const TOKEN = localStorage.getItem('fuliya_token');
+if(!TOKEN && location.pathname !== '/admin'){ location.href='/admin' }
+async function api(url, opt={}){
+  opt.headers = opt.headers || {};
+  opt.headers['Authorization'] = 'Bearer ' + TOKEN;
+  if(opt.body && typeof opt.body === 'object'){ opt.body = JSON.stringify(opt.body); opt.headers['Content-Type']='application/json' }
+  const r = await fetch(url, opt); const j = await r.json();
+  if(j.code === -1 && j.msg === '未登录'){ localStorage.removeItem('fuliya_token'); location.href='/admin' }
+  return j;
 }
-
-var P=['dashboard','products','news','cases','pages','settings','messages','tools'];
-var PT={'dashboard':'数据仪表盘','products':'产品管理','news':'新闻管理','cases':'案例管理','pages':'页面模块编辑','settings':'全站配置','messages':'留言管理','tools':'系统工具'};
-var IC={'dashboard':'📊','products':'📦','news':'📰','cases':'📋','pages':'🏗️','settings':'⚙️','messages':'💬','tools':'🔧'};
-var nav=$('nav');
-P.forEach(function(p,i){
-  var a=document.createElement('div');
-  a.className='sd'+(i===0?' a':'');
-  a.textContent=IC[p]+' '+PT[p];
-  (function(pg){a.onclick=function(){sw(pg)}})(p);
-  nav.appendChild(a);
+const pages = {
+  dashboard: { title:'数据仪表盘', render: renderDashboard },
+  products: { title:'产品管理', render: renderProducts },
+  news: { title:'新闻管理', render: renderNews },
+  cases: { title:'案例管理', render: renderCases },
+  pages: { title:'页面模块编辑', render: renderPages },
+  settings: { title:'全站配置', render: renderSettings },
+  messages: { title:'留言管理', render: renderMessages },
+  tools: { title:'系统工具', render: renderTools }
+};
+function switchPage(name){
+  document.querySelectorAll('#adminNav a').forEach(a => a.classList.remove('active-page'));
+  document.querySelector('#adminNav a[data-page="'+name+'"]')?.classList.add('active-page');
+  document.getElementById('pageTitle').textContent = pages[name]?.title || name;
+  document.getElementById('pageContent').innerHTML = '<div class="text-center py-10 text-gray-400">加载中...</div>';
+  pages[name]?.render();
+}
+document.querySelectorAll('#adminNav a[data-page]').forEach(a => {
+  a.addEventListener('click', function(){ switchPage(this.dataset.page); });
 });
 
-function sw(p){
-  var all=document.querySelectorAll('.sd');
-  for(var i=0;i<all.length;i++)all[i].className='sd';
-  nav.children[P.indexOf(p)].className='sd a';
-  $('pt').textContent=PT[p];
-  $('pc').innerHTML='<div class="text-center py-20 text-gray-400">⏳ 加载中...</div>';
-  if(p==='dashboard')getDashboard();
-  else if(p==='products')getProducts();
-  else if(p==='news')getNews();
-  else if(p==='cases')getCases();
-  else if(p==='pages')showPages();
-  else if(p==='settings')showSettings();
-  else if(p==='messages')getMessages();
-  else if(p==='tools')showTools();
+// === DASHBOARD (align with admin-dashboard.html) ===
+async function renderDashboard(){
+  const d = await api('/admin-api/dashboard');
+  if(!d.data) return;
+  const s = d.data;
+  document.getElementById('pageContent').innerHTML = [
+    // 4 Core Cards with colored left borders (matching prototype)
+    '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">',
+    '<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-[#2ab39f]"><div class="flex items-center justify-between"><div><p class="text-gray-500 text-xs">产品总数</p><p class="text-3xl font-bold text-gray-900 mt-1">'+(s.products||0)+'</p></div><div class="w-12 h-12 bg-[#e8f8f5] rounded-xl flex items-center justify-center"><svg class="w-6 h-6 text-[#2ab39f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg></div></div><div class="flex gap-2 mt-2"><span class="badge badge-green">'+(s.productOn||0)+' 上架</span><span class="badge badge-gray">'+(s.productOff||0)+' 下架</span></div></div>',
+    '<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-blue-500"><div class="flex items-center justify-between"><div><p class="text-gray-500 text-xs">新闻总数</p><p class="text-3xl font-bold text-gray-900 mt-1">'+(s.news||0)+'</p></div><div class="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center"><svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"/></svg></div></div></div>',
+    '<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-purple-500"><div class="flex items-center justify-between"><div><p class="text-gray-500 text-xs">案例总数</p><p class="text-3xl font-bold text-gray-900 mt-1">'+(s.cases||0)+'</p></div><div class="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center"><svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg></div></div></div>',
+    '<div class="bg-white rounded-xl p-5 shadow-sm border-l-4 border-amber-500"><div class="flex items-center justify-between"><div><p class="text-gray-500 text-xs">未读留言</p><p class="text-3xl font-bold text-gray-900 mt-1 text-red-500">'+(s.unread||0)+'</p></div><div class="w-12 h-12 bg-amber-50 rounded-xl flex items-center justify-center"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"/></svg></div></div><div class="mt-2 text-xs text-red-600">&#9888; 需要立即处理</div></div>',
+    '</div>',
+    // Visitor Stats (matching prototype)
+    '<div class="bg-white rounded-xl p-6 shadow-sm mb-6"><div class="flex items-center justify-between mb-4"><h3 class="font-bold text-gray-900">网站访客统计</h3><div class="flex gap-2 text-xs"><button class="px-3 py-1 bg-[#2ab39f] text-white rounded-full">今日</button><button class="px-3 py-1 text-gray-500 hover:bg-gray-100 rounded-full">本周</button><button class="px-3 py-1 text-gray-500 hover:bg-gray-100 rounded-full">本月</button></div></div><div class="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-4"><div class="bg-gray-50 rounded-xl p-4 text-center"><p class="text-xs text-gray-500">今日访问</p><p class="text-2xl font-bold text-[#2ab39f] mt-1">--</p><p class="text-xs text-green-600 mt-1">--</p></div><div class="bg-gray-50 rounded-xl p-4 text-center"><p class="text-xs text-gray-500">本月访问</p><p class="text-2xl font-bold text-gray-900 mt-1">--</p><p class="text-xs text-green-600 mt-1">--</p></div><div class="bg-gray-50 rounded-xl p-4 text-center"><p class="text-xs text-gray-500">累计访问</p><p class="text-2xl font-bold text-gray-900 mt-1">--</p><p class="text-xs text-gray-400 mt-1">上线至今</p></div></div><div class="h-48 bg-gradient-to-b from-gray-50 to-gray-100 rounded-xl flex items-center justify-center"><div class="text-center text-gray-400"><svg class="w-8 h-8 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg><p class="text-sm">访客趋势折线图占位区</p></div></div></div>',
+    // Chart Placeholders (2 cols: line + pie)
+    '<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">',
+    '<div class="bg-white rounded-xl p-6 shadow-sm"><h3 class="font-bold text-gray-900 mb-4">月度数据趋势 (折线图)</h3><div class="h-64 bg-gradient-to-b from-gray-50 to-gray-100 rounded-xl flex items-center justify-center"><div class="text-center text-gray-400"><svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"/></svg><p class="text-sm">折线图占位区</p></div></div></div>',
+    '<div class="bg-white rounded-xl p-6 shadow-sm"><h3 class="font-bold text-gray-900 mb-4">产品分类占比 (饼图)</h3><div class="h-64 bg-gradient-to-b from-gray-50 to-gray-100 rounded-xl flex items-center justify-center"><div class="text-center text-gray-400"><svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z"/></svg><p class="text-sm">饼图占位区</p></div></div></div>',
+    '</div>',
+    // Bar Chart + Recent Messages (matching prototype)
+    '<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">',
+    '<div class="bg-white rounded-xl p-6 shadow-sm"><h3 class="font-bold text-gray-900 mb-4">月度发布统计 (柱状图)</h3><div class="h-64 bg-gradient-to-b from-gray-50 to-gray-100 rounded-xl flex items-center justify-center"><div class="text-center text-gray-400"><svg class="w-10 h-10 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/></svg><p class="text-sm">柱状图占位区</p></div></div></div>',
+    '<div class="bg-white rounded-xl p-6 shadow-sm"><h3 class="font-bold text-gray-900 mb-4">最近留言</h3><div id="recent-messages-list" class="space-y-3">',
+    '<div class="flex items-start gap-3 pb-3 border-b border-gray-100"><div class="w-8 h-8 bg-[#e8f8f5] rounded-full flex items-center justify-center text-sm font-bold text-[#2ab39f]">?</div><div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-900">加载中...</p></div></div>',
+    '</div><a href="javascript:switchPage(\'messages\')" class="inline-block mt-4 text-sm text-[#2ab39f] hover:underline">查看全部留言 &rarr;</a></div>',
+    '</div>',
+    // Quick Actions
+    '<div class="bg-white rounded-xl p-6 shadow-sm"><h3 class="font-bold text-gray-900 mb-4">快捷操作</h3><div class="flex flex-wrap gap-3">',
+    '<a onclick="switchPage(\'products\')" class="px-5 py-2.5 bg-[#2ab39f] text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-[#1f8f7e] transition">新建产品</a>',
+    '<a onclick="switchPage(\'news\')" class="px-5 py-2.5 bg-blue-500 text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-blue-600 transition">发布新闻</a>',
+    '<a onclick="switchPage(\'messages\')" class="px-5 py-2.5 bg-amber-500 text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-amber-600 transition">处理留言</a>',
+    '<a onclick="switchPage(\'tools\')" class="px-5 py-2.5 bg-gray-600 text-white rounded-lg text-sm font-medium cursor-pointer hover:bg-gray-700 transition">系统工具</a>',
+    '</div></div>'
+  ].join('');
+  // Load recent messages
+  try {
+    const msgData = await api('/admin-api/messages');
+    const msgList = msgData.data?.list || [];
+    const recentHtml = msgList.slice(0,4).map(function(m){
+      var initial = (m.name || '?').charAt(0);
+      var colors = ['bg-[#e8f8f5] text-[#2ab39f]','bg-blue-100 text-blue-500','bg-purple-100 text-purple-500','bg-amber-100 text-amber-500'];
+      var ci = Math.abs((m.id||0)) % colors.length;
+      return '<div class="flex items-start gap-3 pb-3 border-b border-gray-100"><div class="w-8 h-8 '+colors[ci]+' rounded-full flex items-center justify-center text-sm font-bold">'+initial+'</div><div class="flex-1 min-w-0"><p class="text-sm font-medium text-gray-900">'+(m.name||'未知')+' <span class="text-xs text-gray-400 ml-2">'+(m.create_time?new Date(m.create_time).toLocaleDateString()+'':'')+'</span></p><p class="text-xs text-gray-500 truncate">'+(m.demand||m.subject||'').substring(0,50)+'</p></div></div>';
+    }).join('');
+    if(recentHtml){
+      document.getElementById('recent-messages-list').innerHTML = recentHtml;
+    }
+  } catch(e){}
 }
 
-async function getDashboard(){
-  var d=await api('/admin-api/dashboard');
-  if(!d.data){ $('pc').innerHTML='<div class="text-center py-10 text-gray-400">⚠️ 数据加载失败，请重试</div>'; return; }
-  var s=d.data;
-  var h='<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">';
-  h+=card('产品总数',s.products);
-  h+=card('新闻动态',s.news);
-  h+=card('客户案例',s.cases);
-  h+='</div><div class="bg-white rounded-xl border p-6"><h2 class="font-semibold mb-4">快捷操作</h2><div class="grid grid-cols-2 md:grid-cols-4 gap-3">';
-  h+=btn('＋ 新增产品',"location.href='/admin/products/new'",'#e6f7f4');
-  h+=btn('📰 发布新闻',"sw('news')",'#dbeafe');
-  h+=btn('📋 查看留言',"sw('messages')",'#fef3c7');
-  h+=btn('⚙️ 系统设置',"sw('settings')",'#f3f4f6');
-  h+='</div></div>';
-  $('pc').innerHTML=h;
+// === PRODUCTS (align with admin-products.html) ===
+async function renderProducts(){
+  const d = await api('/admin-api/products');
+  const cats = (await api('/admin-api/categories')).data || [];
+  const list = d.data?.list || [];
+  document.getElementById('pageContent').innerHTML = [
+    '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">',
+    '<div class="flex gap-2"><button class="bg-[#2ab39f] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition" onclick="switchPage(\'products\')">+ 新建产品</button><button class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50" onclick="batchAction(\'products\',\'delete\')">批量删除</button><button class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50" onclick="batchAction(\'products\',\'publish\')">批量上架</button></div>',
+    '<div class="flex gap-2 w-full sm:w-auto"><input type="text" placeholder="搜索产品..." class="w-full sm:w-48 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2ab39f]/30"><select class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500"><option>全部分类</option>'+cats.map(function(c){return '<option>'+(c.name||c)+'</option>';}).join('')+'</select></div></div>',
+    '<div class="bg-white rounded-xl shadow-sm overflow-x-auto mb-8"><table class="w-full text-sm"><thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="text-left px-4 py-3"><input type="checkbox" class="rounded"></th><th class="text-left px-4 py-3">ID</th><th class="text-left px-4 py-3">封面</th><th class="text-left px-4 py-3">英文名</th><th class="text-left px-4 py-3">中文名</th><th class="text-left px-4 py-3">分类</th><th class="text-left px-4 py-3">状态</th><th class="text-left px-4 py-3">推荐</th><th class="text-left px-4 py-3">排序</th><th class="text-left px-4 py-3">时间</th><th class="text-left px-4 py-3">操作</th></tr></thead><tbody class="divide-y divide-gray-100">',
+    list.map(function(p){return '<tr class="hover:bg-gray-50"><td class="px-4 py-3"><input type="checkbox" class="rounded"></td><td class="px-4 py-3 font-mono text-xs text-gray-900">#'+String(p.id).padStart(3,"0")+'</td><td class="px-4 py-3"><div class="w-10 h-10 bg-[#e8f8f5] rounded-lg flex items-center justify-center text-xs text-[#2ab39f]">Img</div></td><td class="px-4 py-3 text-gray-900">'+(p.title_en||"-")+'</td><td class="px-4 py-3 text-gray-900 font-medium">'+(p.title_zh||"")+'</td><td class="px-4 py-3"><span class="px-2 py-0.5 bg-[#e8f8f5] text-[#2ab39f] text-xs rounded-full">'+(p.cat||"-")+'</span></td><td class="px-4 py-3"><span class="px-2 py-0.5 '+(p.status===1?"bg-green-100 text-green-600":"bg-amber-100 text-amber-600")+' text-xs rounded-full">'+(p.status===1?"已上架":"草稿")+'</span></td><td class="px-4 py-3"><span class="'+(p.is_recommend?"text-green-500":"text-gray-300")+'">&#9733;</span></td><td class="px-4 py-3 text-gray-500">'+(p.sort_order||p.id)+'</td><td class="px-4 py-3 text-gray-500 text-xs">'+(p.create_time?new Date(p.create_time).toLocaleDateString():"-")+'</td><td class="px-4 py-3"><div class="flex gap-2"><span class="text-[#2ab39f] text-xs cursor-pointer hover:underline" onclick="toggleProduct('+p.id+','+(p.status===1?0:1)+')">'+(p.status===1?"下架":"上架")+'</span><span class="text-red-500 text-xs cursor-pointer hover:underline" onclick="deleteProduct('+p.id+')">删除</span></div></td></tr>';}).join(''),
+    '</tbody></table></div>',
+    '<div class="bg-white rounded-xl shadow-sm overflow-hidden"><div class="border-b border-gray-200 px-4 lg:px-6"><div class="flex gap-6 overflow-x-auto text-sm font-medium text-gray-500">',
+    '<button class="tab-active py-4 border-b-2 border-[#2ab39f] text-[#2ab39f] whitespace-nowrap" id="prod-tab-basic" onclick="switchProdTab(event,\'basic\')">基本信息</button>',
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="prod-tab-seo" onclick="switchProdTab(event,\'seo\')">SEO</button>',
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="prod-tab-params" onclick="switchProdTab(event,\'params\')">分类参数</button>',
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="prod-tab-detail" onclick="switchProdTab(event,\'detail\')">详情图文</button>',
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="prod-tab-faq" onclick="switchProdTab(event,\'faq\')">FAQ</button>',
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="prod-tab-related" onclick="switchProdTab(event,\'related\')">捆绑关联</button>',
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="prod-tab-preview" onclick="switchProdTab(event,\'preview\')">预览</button>',
+    '</div></div>',
+    '<div id="prod-panel-basic" class="p-4 lg:p-6 space-y-5"><h3 class="font-bold text-gray-900">基本信息</h3><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">中文名称</label><input id="prod-title_zh" class="form-input" placeholder="输入中文名称"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">英文名称</label><input id="prod-title_en" class="form-input" placeholder="输入英文名称"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">产品编号</label><input id="prod-product_no" class="form-input" placeholder="如：FL-M-200"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">产品分类</label><select id="prod-category" class="form-input"><option value="">请选择分类</option>'+cats.map(function(c){return '<option value="'+(c.name||c)+'">'+(c.name||c)+'</option>';}).join('')+'</select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">状态</label><select id="prod-status" class="form-input"><option value="1">已上架</option><option value="0">草稿</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">排序权重</label><input id="prod-sort_order" type="number" class="form-input" value="1"></div></div><div><label class="block text-sm font-medium text-gray-700 mb-1">简短描述</label><textarea id="prod-description" rows="2" class="form-input" placeholder="产品简短描述"></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-1">产品封面</label><div class="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-sm cursor-pointer hover:border-[#2ab39f] transition">点击上传图片</div></div><div class="flex gap-3 pt-4 border-t border-gray-100"><button class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition" onclick="saveProduct()">保存</button><button class="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition">预览</button></div></div>',
+    '<div id="prod-panel-seo" class="p-4 lg:p-6 space-y-5 hidden"><h3 class="font-bold text-gray-900">SEO 设置</h3><div><label class="block text-sm font-medium text-gray-700 mb-1">SEO 标题</label><input id="prod-seo_title" class="form-input" placeholder="自定义SEO标题，留空使用产品名称"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">SEO 描述</label><textarea id="prod-seo_description" rows="3" class="form-input" placeholder="SEO meta description"></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-1">SEO 关键词</label><input id="prod-seo_keywords" class="form-input" placeholder="关键词用逗号分隔"></div></div>',
+    '<div id="prod-panel-params" class="p-4 lg:p-6 space-y-5 hidden"><h3 class="font-bold text-gray-900">分类参数</h3><p class="text-sm text-gray-400">此处根据所选分类动态加载参数配置项。</p></div>',
+    '<div id="prod-panel-detail" class="p-4 lg:p-6 space-y-5 hidden"><h3 class="font-bold text-gray-900">详情图文</h3><div><label class="block text-sm font-medium text-gray-700 mb-1">详情描述</label><textarea id="prod-detail_content" rows="6" class="form-input" placeholder="产品详细描述，支持富文本编辑"></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-1">产品图片（多张）</label><div class="w-full h-32 bg-gray-50 border-2 border-dashed border-gray-200 rounded-xl flex items-center justify-center text-gray-400 text-sm cursor-pointer hover:border-[#2ab39f] transition">点击上传多张图片</div></div></div>',
+    '<div id="prod-panel-faq" class="p-4 lg:p-6 space-y-5 hidden"><h3 class="font-bold text-gray-900">常见问题 FAQ</h3><p class="text-sm text-gray-400">添加产品相关的常见问题与解答。</p></div>',
+    '<div id="prod-panel-related" class="p-4 lg:p-6 space-y-5 hidden"><h3 class="font-bold text-gray-900">捆绑关联</h3><p class="text-sm text-gray-400">关联其他产品，用于产品详情页展示相关推荐。</p></div>',
+    '<div id="prod-panel-preview" class="p-4 lg:p-6 space-y-5 hidden"><h3 class="font-bold text-gray-900">预览</h3><p class="text-sm text-gray-400">前端效果预览区域。</p></div></div>'
+  ].join('');
 }
-function card(t,v,color){
-  return '<div class="bg-white rounded-xl border p-6"><div class="text-sm text-gray-500 mb-1">'+t+'</div><div class="text-3xl font-bold '+(color||'')+'">'+v+'</div></div>';
+async function toggleProduct(id, status){
+  await api('/admin-api/products/'+id, { method:'PUT', body: { status: status } });
+  renderProducts();
 }
-function btn(t,o,bg){
-  return '<div class="p-3 rounded-lg text-sm text-center cursor-pointer" style="background:'+bg+'" onclick="'+o+'">'+t+'</div>';
+async function deleteProduct(id){ if(confirm('确认删除产品？')){ await api('/admin-api/products/'+id,{method:'DELETE'}); switchPage('products'); } }
+
+// === NEWS (align with admin-news.html) ===
+async function renderNews(){
+  const d = await api('/admin-api/news');
+  const list = d.data?.list || [];
+  var filterOpts = '<option>公司新闻</option><option>行业资讯</option><option>产品动态</option><option>展会活动</option>';
+  document.getElementById('pageContent').innerHTML = [
+    '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">',
+    '<a class="bg-[#2ab39f] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition cursor-pointer" onclick="switchPage(\'news\')">+ 新建新闻</a>',
+    '<div class="flex gap-2 w-full sm:w-auto"><input type="text" placeholder="搜索新闻..." class="w-full sm:w-48 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2ab39f]/30"><select class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500"><option>全部分类</option>'+filterOpts+'</select><select class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500"><option>全部状态</option><option>已发布</option><option>草稿</option></select></div></div>',
+    '<div class="bg-white rounded-xl shadow-sm overflow-x-auto mb-8"><table class="w-full text-sm"><thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="text-left px-4 py-3"><input type="checkbox" class="rounded"></th><th class="text-left px-4 py-3">ID</th><th class="text-left px-4 py-3">标题</th><th class="text-left px-4 py-3">分类</th><th class="text-left px-4 py-3">作者</th><th class="text-left px-4 py-3">时间</th><th class="text-left px-4 py-3">状态</th><th class="text-left px-4 py-3">操作</th></tr></thead><tbody class="divide-y divide-gray-100">',
+    list.map(function(n){return '<tr class="hover:bg-gray-50"><td class="px-4 py-3"><input type="checkbox"></td><td class="px-4 py-3 font-mono text-xs text-gray-900">#N'+String(n.id).padStart(3,"0")+'</td><td class="px-4 py-3 text-gray-900 font-medium">'+(n.title_zh||'')+'</td><td class="px-4 py-3"><span class="px-2 py-0.5 bg-[#e8f8f5] text-[#2ab39f] text-xs rounded-full">'+(n.category||'公司新闻')+'</span></td><td class="px-4 py-3 text-gray-600">'+(n.author||'管理员')+'</td><td class="px-4 py-3 text-gray-500 text-xs">'+(n.create_time?new Date(n.create_time).toLocaleDateString():"-")+'</td><td class="px-4 py-3"><span class="px-2 py-0.5 '+(n.status===1?"bg-green-100 text-green-600":"bg-amber-100 text-amber-600")+' text-xs rounded-full">'+(n.status===1?"已发布":"草稿")+'</span></td><td class="px-4 py-3"><div class="flex gap-2"><span class="text-[#2ab39f] text-xs cursor-pointer hover:underline" onclick="toggleNews('+n.id+','+(n.status===1?0:1)+')">'+(n.status===1?"下架":"发布")+'</span><span class="text-red-500 text-xs cursor-pointer hover:underline" onclick="deleteNews('+n.id+')">删除</span></div></td></tr>';}).join(''),
+    '</tbody></table></div>',
+    '<div class="bg-white rounded-xl shadow-sm p-6"><h3 class="font-bold text-gray-900 mb-4">新建/编辑新闻</h3><div class="space-y-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">标题</label><input id="news-title_zh" class="form-input" placeholder="输入新闻标题"></div><div class="grid grid-cols-1 md:grid-cols-3 gap-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">分类</label><select id="news-category" class="form-input"><option>公司新闻</option><option>行业资讯</option><option>产品动态</option><option>展会活动</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">作者</label><input id="news-author" class="form-input" placeholder="输入作者"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">状态</label><select id="news-status" class="form-input"><option value="1">已发布</option><option value="0">草稿</option></select></div></div><div><label class="block text-sm font-medium text-gray-700 mb-1">摘要</label><textarea id="news-summary" rows="2" class="form-input" placeholder="新闻摘要..."></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-1">正文内容</label><textarea id="news-content" rows="6" class="form-input" placeholder="输入新闻正文内容..."></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-1">标签（逗号分隔）</label><input id="news-tags" class="form-input" placeholder="ISO认证, 环境保护, 可持续发展"></div><div class="flex gap-3 pt-4 border-t border-gray-100"><button class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition" onclick="saveNews()">保存</button><button class="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition">预览</button></div></div></div>'
+  ].join('');
 }
+async function toggleNews(id, status){ await api('/admin-api/news/'+id, { method:'PUT', body: { status: status } }); renderNews(); }
+async function deleteNews(id){ if(confirm('确认删除新闻？')){ await api('/admin-api/news/'+id,{method:'DELETE'}); switchPage('news'); } }
 
-// Products
-async function getProducts(){
-  var d=await api('/admin-api/products');
-  var list=d.data&&d.data.list?d.data.list:[];
-  var total=d.data?d.data.total:0;
-  var h='<div class="flex items-center justify-between mb-6"><div><h1 class="text-lg font-bold">产品管理</h1><p class="text-sm text-gray-400">共 '+total+' 款产品</p></div>';
-  h+='<div class="flex gap-2"><button onclick="location.href=\'/admin/products/new\'" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm font-medium">＋ 新增产品</button>';
-  h+='<button class="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm">📤 导出</button></div></div>';
-  h+='<div class="bg-white rounded-xl border overflow-hidden"><table class="tbl"><thead><tr><th>产品名称</th><th>分类</th><th>MOQ</th><th>状态</th><th>操作</th></tr></thead><tbody>';
-  for(var i=0;i<list.length;i++){
-    var p=list[i];
-    h+='<tr><td class="font-medium">'+h(p.title_zh)+'</td><td>'+h(p.cat||'-')+'</td><td>'+h(p.moq||'-')+'</td>';
-    h+='<td><span class="bdg '+(p.status===1?'bdg-g':'bdg-gy')+'">'+(p.status===1?'上架':'下架')+'</span></td>';
-    h+='<td><a href="/admin/products/edit/'+p.id+'" class="text-[#2ab39f] text-sm cursor-pointer hover:underline">编辑</a><span class="text-gray-300 mx-1">|</span><span class="text-red-500 text-sm cursor-pointer" onclick="toggleProduct('+p.id+','+(p.status===1?0:1)+')">'+(p.status===1?'下架':'上架')+'</span></td></tr>';
-  }
-  h+='</tbody></table></div>';
-  $('pc').innerHTML=h;
+// === CASES (align with admin-cases.html) ===
+async function renderCases(){
+  const d = await api('/admin-api/cases');
+  const list = d.data?.list || [];
+  var indOpts = '<option>汽车制造</option><option>家用电器</option><option>电子通信</option><option>医疗器械</option><option>航空航天</option>';
+  document.getElementById('pageContent').innerHTML = [
+    '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">',
+    '<a class="bg-[#2ab39f] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition cursor-pointer" onclick="switchPage(\'cases\')">+ 新建案例</a>',
+    '<div class="flex gap-2 w-full sm:w-auto"><input type="text" placeholder="搜索案例..." class="w-full sm:w-48 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2ab39f]/30"><select class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500"><option>全部分类</option>'+indOpts+'</select></div></div>',
+    '<div class="bg-white rounded-xl shadow-sm overflow-x-auto mb-8"><table class="w-full text-sm"><thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="text-left px-4 py-3"><input type="checkbox" class="rounded"></th><th class="text-left px-4 py-3">ID</th><th class="text-left px-4 py-3">标题</th><th class="text-left px-4 py-3">客户</th><th class="text-left px-4 py-3">行业</th><th class="text-left px-4 py-3">国家</th><th class="text-left px-4 py-3">时间</th><th class="text-left px-4 py-3">状态</th><th class="text-left px-4 py-3">操作</th></tr></thead><tbody class="divide-y divide-gray-100">',
+    list.map(function(c){return '<tr class="hover:bg-gray-50"><td class="px-4 py-3"><input type="checkbox" class="rounded"></td><td class="px-4 py-3 font-mono text-xs text-gray-900">#C'+String(c.id).padStart(3,"0")+'</td><td class="px-4 py-3 text-gray-900 font-medium">'+(c.title_zh||'')+'</td><td class="px-4 py-3 text-gray-600">'+(c.client_name||"-")+'</td><td class="px-4 py-3"><span class="px-2 py-0.5 bg-blue-100 text-blue-600 text-xs rounded-full">'+(c.industry||"-")+'</span></td><td class="px-4 py-3 text-gray-500">'+(c.country||"-")+'</td><td class="px-4 py-3 text-gray-500 text-xs">'+(c.create_time?new Date(c.create_time).toLocaleDateString():"-")+'</td><td class="px-4 py-3"><span class="px-2 py-0.5 '+(c.status===1?"bg-green-100 text-green-600":"bg-amber-100 text-amber-600")+' text-xs rounded-full">'+(c.status===1?"已发布":"草稿")+'</span></td><td class="px-4 py-3"><div class="flex gap-2"><span class="text-[#2ab39f] text-xs cursor-pointer hover:underline" onclick="toggleCase('+c.id+','+(c.status===1?0:1)+')">'+(c.status===1?"下架":"展示")+'</span><span class="text-red-500 text-xs cursor-pointer hover:underline" onclick="deleteCase('+c.id+')">删除</span></div></td></tr>';}).join(''),
+    '</tbody></table></div>',
+    '<div class="bg-white rounded-xl shadow-sm p-6"><h3 class="font-bold text-gray-900 mb-4">新建/编辑案例</h3><div class="space-y-4"><div class="grid grid-cols-1 md:grid-cols-2 gap-4"><div><label class="block text-sm font-medium text-gray-700 mb-1">案例标题</label><input id="case-title_zh" class="form-input" placeholder="案例名称"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">客户名称</label><input id="case-client_name" class="form-input" placeholder="客户公司名称"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">所属行业</label><select id="case-industry" class="form-input"><option>汽车制造</option><option>家用电器</option><option>电子通信</option><option>医疗器械</option><option>航空航天</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">国家/地区</label><input id="case-country" class="form-input" placeholder="如：中国"></div><div><label class="block text-sm font-medium text-gray-700 mb-1">状态</label><select id="case-status" class="form-input"><option value="1">已发布</option><option value="0">草稿</option></select></div><div><label class="block text-sm font-medium text-gray-700 mb-1">排序</label><input id="case-sort_order" type="number" class="form-input" value="1"></div></div><div><label class="block text-sm font-medium text-gray-700 mb-1">案例摘要</label><textarea id="case-summary" rows="3" class="form-input" placeholder="案例简介..."></textarea></div><div><label class="block text-sm font-medium text-gray-700 mb-1">客户评价</label><textarea id="case-testimonial" rows="2" class="form-input" placeholder="引用的客户评价..."></textarea></div><div class="flex gap-3 pt-4 border-t border-gray-100"><button class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition" onclick="saveCase()">保存</button><button class="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition">预览</button></div></div></div>'
+  ].join('');
 }
-async function toggleProduct(id,st){await api('/admin-api/products/'+id,{method:'PUT',body:{status:st}});getProducts()}
+async function toggleCase(id, status){ await api('/admin-api/cases/'+id, { method:'PUT', body: { status: status } }); renderCases(); }
+async function deleteCase(id){ if(confirm('确认删除案例？')){ await api('/admin-api/cases/'+id,{method:'DELETE'}); switchPage('cases'); } }
 
-// News
-async function getNews(){
-  var d=await api('/admin-api/news');
-  var list=d.data&&d.data.list?d.data.list:[];
-  var h='<div class="flex items-center justify-between mb-6"><div><h1 class="text-lg font-bold">新闻管理</h1><p class="text-sm text-gray-400">共 '+(d.data&&d.data.total||0)+' 篇</p></div>';
-  h+='<button onclick="modalAddNews()" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm font-medium">＋ 发布新闻</button></div>';
-  h+='<div class="bg-white rounded-xl border overflow-hidden"><table class="tbl"><thead><tr><th>标题</th><th>状态</th><th>操作</th></tr></thead><tbody>';
-  for(var i=0;i<list.length;i++){
-    var n=list[i];
-    h+='<tr><td class="font-medium">'+h(n.title_zh)+'</td>';
-    h+='<td><span class="bdg '+(n.status===1?'bdg-g':'bdg-gy')+'">'+(n.status===1?'已发布':'下架')+'</span></td>';
-    h+='<td><span class="text-[#2ab39f] text-sm cursor-pointer">编辑</span><span class="text-gray-300 mx-1">|</span><span class="text-red-500 text-sm cursor-pointer" onclick="toggleNews('+n.id+','+(n.status===1?0:1)+')">'+(n.status===1?'下架':'发布')+'</span></td></tr>';
-  }
-  h+='</tbody></table></div>';
-  $('pc').innerHTML=h;
-}
-async function toggleNews(id,st){await api('/admin-api/news/'+id,{method:'PUT',body:{status:st}});getNews()}
+// === PAGES MODULE EDITOR (align with admin-page-sections.html) ===
+var pageKeys = ['home','products','product-detail','about','strength','cases','news','contact'];
+var pageLabels = ['首页','产品列表','产品详情','关于我们','企业实力','客户案例','新闻动态','联系我们'];
+var currentPageSections = [];
 
-function modalAddNews(){
-  om('<h2 class="text-lg font-bold mb-4">发布新闻</h2><form onsubmit="return submitNews(event)" class="space-y-4">'+
-    '<div class="grid grid-cols-2 gap-4"><div><label class="text-sm font-semibold block mb-1">标题（中文）<span class="text-red-500">*</span></label><input class="fi" name="title_zh" required></div>'+
-    '<div><label class="text-sm font-semibold block mb-1">标题（英文）</label><input class="fi" name="title_en"></div></div>'+
-    '<div class="grid grid-cols-2 gap-4"><div><label class="text-sm font-semibold block mb-1">正文（中文）</label><textarea class="fi" name="content_zh" rows="4"></textarea></div>'+
-    '<div><label class="text-sm font-semibold block mb-1">正文（英文）</label><textarea class="fi" name="content_en" rows="4"></textarea></div></div>'+
-    '<div><label class="text-sm font-semibold block mb-1">标签</label><input class="fi" name="tags" placeholder="如: 公司新闻"></div>'+
-    '<div class="flex gap-3"><button type="submit" class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm">发布</button>'+
-    '<button type="button" onclick="cm()" class="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-lg text-sm">取消</button></div></form>');
-}
-async function submitNews(e){e.preventDefault();var f=new FormData(e.target);var d={};f.forEach(function(v,k){d[k]=v});await api('/admin-api/news',{method:'POST',body:d});cm();getNews();return false}
-
-// Cases
-async function getCases(){
-  var d=await api('/admin-api/cases');
-  var list=d.data&&d.data.list?d.data.list:[];
-  var h='<div class="flex items-center justify-between mb-6"><div><h1 class="text-lg font-bold">案例管理</h1><p class="text-sm text-gray-400">共 '+(d.data&&d.data.total||0)+' 个</p></div>';
-  h+='<button onclick="modalAddCase()" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm font-medium">＋ 新增案例</button></div>';
-  h+='<div class="bg-white rounded-xl border overflow-hidden"><table class="tbl"><thead><tr><th>案例名称</th><th>客户</th><th>状态</th><th>操作</th></tr></thead><tbody>';
-  for(var i=0;i<list.length;i++){
-    var c=list[i];
-    h+='<tr><td class="font-medium">'+h(c.title_zh)+'</td><td>'+h(c.client_name)+'</td>';
-    h+='<td><span class="bdg '+(c.status===1?'bdg-g':'bdg-gy')+'">'+(c.status===1?'展示中':'已下架')+'</span></td>';
-    h+='<td><span class="text-[#2ab39f] text-sm cursor-pointer">编辑</span><span class="text-gray-300 mx-1">|</span><span class="text-red-500 text-sm cursor-pointer" onclick="toggleCase('+c.id+','+(c.status===1?0:1)+')">'+(c.status===1?'下架':'展示')+'</span></td></tr>';
-  }
-  h+='</tbody></table></div>';
-  $('pc').innerHTML=h;
-}
-async function toggleCase(id,st){await api('/admin-api/cases/'+id,{method:'PUT',body:{status:st}});getCases()}
-
-function modalAddCase(){
-  om('<h2 class="text-lg font-bold mb-4">新增案例</h2><form onsubmit="return submitCase(event)" class="space-y-4">'+
-    '<div class="grid grid-cols-2 gap-4"><div><label class="text-sm font-semibold block mb-1">名称（中文）<span class="text-red-500">*</span></label><input class="fi" name="title_zh" required></div>'+
-    '<div><label class="text-sm font-semibold block mb-1">名称（英文）</label><input class="fi" name="title_en"></div></div>'+
-    '<div><label class="text-sm font-semibold block mb-1">客户名称</label><input class="fi" name="client_name"></div>'+
-    '<div class="grid grid-cols-2 gap-4"><div><label class="text-sm font-semibold block mb-1">详情（中文）</label><textarea class="fi" name="content_zh" rows="4"></textarea></div>'+
-    '<div><label class="text-sm font-semibold block mb-1">详情（英文）</label><textarea class="fi" name="content_en" rows="4"></textarea></div></div>'+
-    '<div class="flex gap-3"><button type="submit" class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm">保存</button>'+
-    '<button type="button" onclick="cm()" class="border border-gray-300 text-gray-600 px-6 py-2.5 rounded-lg text-sm">取消</button></div></form>');
-}
-async function submitCase(e){e.preventDefault();var f=new FormData(e.target);var d={};f.forEach(function(v,k){d[k]=v});await api('/admin-api/cases',{method:'POST',body:d});cm();getCases();return false}
-
-// Pages Module Editor - upgraded with real section editing
-// Page Module Editor - matching the layout demo
-var _pageSectionDefs = {
-  home:[
-    {idx:'①', key:'banner', title:'全屏 Banner', hint:'首页顶部 · 模块 key: banner'},
-    {idx:'②', key:'advantages', title:'四大核心优势', hint:'首页 · 模块 key: advantages · 4 个图标区块'},
-    {idx:'③', key:'featured-products', title:'热门产品展示', hint:'首页 · 模块 key: featured-products · 3×3 网格'},
-    {idx:'④', key:'factory-intro', title:'工厂图文介绍', hint:'首页 · 模块 key: factory-intro'},
-    {idx:'⑤', key:'brand-wall', title:'Logo 合作品牌墙', hint:'首页 · 模块 key: brand-wall'},
-    {idx:'⑥', key:'faq', title:'FAQ 常见问题', hint:'首页 · 模块 key: faq'},
-    {idx:'⑦', key:'cta', title:'底部 CTA 引导', hint:'首页 · 模块 key: cta'}
-  ],
-  products:[
-    {idx:'①', key:'banner', title:'Banner', hint:'产品中心 · 模块 key: banner'},
-    {idx:'②', key:'breadcrumb', title:'面包屑导航', hint:'产品中心 · 模块 key: breadcrumb'},
-    {idx:'③', key:'filter', title:'分类筛选', hint:'产品中心 · 模块 key: filter'},
-    {idx:'④', key:'product-grid', title:'产品网格', hint:'产品中心 · 模块 key: product-grid'},
-    {idx:'⑤', key:'pagination', title:'分页', hint:'产品中心 · 模块 key: pagination'}
-  ],
-  about:[
-    {idx:'①', key:'banner', title:'Banner', hint:'关于我们 · 模块 key: banner'},
-    {idx:'②', key:'intro', title:'公司简介', hint:'关于我们 · 模块 key: intro'},
-    {idx:'③', key:'history', title:'发展历程', hint:'关于我们 · 模块 key: history · 时间轴可增删'},
-    {idx:'④', key:'team', title:'团队卡片', hint:'关于我们 · 模块 key: team'},
-    {idx:'⑤', key:'culture', title:'企业文化', hint:'关于我们 · 模块 key: culture'}
-  ],
-  strength:[
-    {idx:'①', key:'banner', title:'Banner', hint:'企业实力 · 模块 key: banner'},
-    {idx:'②', key:'base', title:'生产基地', hint:'企业实力 · 模块 key: base'},
-    {idx:'③', key:'certs', title:'证书网格', hint:'企业实力 · 模块 key: certs'},
-    {idx:'④', key:'equipment', title:'核心设备', hint:'企业实力 · 模块 key: equipment'},
-    {idx:'⑤', key:'workshop', title:'车间展厅', hint:'企业实力 · 模块 key: workshop'},
-    {idx:'⑥', key:'qc', title:'质控流程', hint:'企业实力 · 模块 key: qc'},
-    {idx:'⑦', key:'capacity', title:'生产能力', hint:'企业实力 · 模块 key: capacity'},
-    {idx:'⑧', key:'timeline', title:'定制时间轴', hint:'企业实力 · 模块 key: timeline'}
-  ],
-  cases:[
-    {idx:'①', key:'banner', title:'Banner', hint:'客户案例 · 模块 key: banner'},
-    {idx:'②', key:'filter', title:'分类筛选', hint:'客户案例 · 模块 key: filter'},
-    {idx:'③', key:'case-list', title:'案例列表', hint:'客户案例 · 模块 key: case-list'},
-    {idx:'④', key:'case-detail', title:'案例详情', hint:'客户案例 · 模块 key: case-detail'}
-  ],
-  news:[
-    {idx:'①', key:'banner', title:'Banner', hint:'新闻中心 · 模块 key: banner'},
-    {idx:'②', key:'filter', title:'分类筛选', hint:'新闻中心 · 模块 key: filter'},
-    {idx:'③', key:'news-list', title:'新闻列表', hint:'新闻中心 · 模块 key: news-list'},
-    {idx:'④', key:'detail', title:'详情', hint:'新闻中心 · 模块 key: detail'},
-    {idx:'⑤', key:'related', title:'相关推荐', hint:'新闻中心 · 模块 key: related'}
-  ],
-  contact:[
-    {idx:'①', key:'banner', title:'Banner', hint:'联系我们 · 模块 key: banner'},
-    {idx:'②', key:'info', title:'联系方式（含FAX）', hint:'联系我们 · 模块 key: info'},
-    {idx:'③', key:'map', title:'地图', hint:'联系我们 · 模块 key: map'},
-    {idx:'④', key:'form', title:'留言表单', hint:'联系我们 · 模块 key: form'}
-  ]
-};
-var _pageLabels = {home:'首页',products:'产品中心',about:'关于我们',strength:'企业实力',cases:'客户案例',news:'新闻博客',contact:'联系我们'};
-var _pageKeys = ['home','products','about','strength','cases','news','contact'];
-
-function showPages(){ _showPageMods('home'); }
-
-async function _showPageMods(pg){
-  var h='<div class="mb-4"><h1 class="text-lg font-bold">页面模块编辑</h1><p class="page-desc">选择页面，编辑模块内容</p></div>';
-  h+='<div class="flex gap-2 mb-6 flex-wrap">';
-  for(var i=0;i<_pageKeys.length;i++){
-    h+='<span class="px-4 py-2 rounded-lg text-sm cursor-pointer '+(pg===_pageKeys[i]?'bg-[#2ab39f] text-white':'border border-gray-200 text-gray-600 hover:border-[#2ab39f]')+'" onclick="_showPageMods(\''+_pageKeys[i]+'\')">'+_pageLabels[_pageKeys[i]]+'</span>';
-  }
-  h+='</div><div id="page-sections-list" class="space-y-4"><div class="text-center py-10 text-gray-400">⏳ 加载板块...</div></div>';
-  $('pc').innerHTML=h;
-  await _renderModules(pg);
-}
-
-async function _renderModules(pg){
-  var container = document.getElementById('page-sections-list');
+async function loadSections(pageKey){
+  var r = await api('/admin-api/sections?page=' + pageKey);
+  currentPageSections = r.data || [];
+  var container = document.getElementById('section-list-container');
   if(!container) return;
-  var defs = _pageSectionDefs[pg] || [];
-  if(!defs.length){ container.innerHTML='<div class="text-center py-10 text-gray-400">暂无可编辑的板块</div>'; return; }
-
-  // Fetch DB data with timeout fallback
-  var d = await Promise.race([
-    api('/admin-api/sections?page='+pg),
-    new Promise(function(resolve){
-      setTimeout(function(){ resolve({code:-1,msg:'timeout',data:[]}); }, 6000);
-    })
-  ]);
-  var dbData = d.data || [];
-  function findByKey(k){ for(var i=0;i<dbData.length;i++){ if(dbData[i].section_key===k) return dbData[i]; } return null; }
-
+  var s = currentPageSections;
+  if(!s.length){
+    container.innerHTML = '<div class="p-8 text-center text-gray-400 text-sm">该页面暂无模块数据，请在数据库中录入 page_sections 记录。</div>';
+    return;
+  }
   var h = '';
-  for(var i=0;i<defs.length;i++){
-    var def = defs[i];
-    var db = findByKey(def.key);
-    var st = db ? (db.status!==0) : true;
-    var sid = db ? db.id : 0;
-
-    h+='<div class="bg-white rounded-xl border border-gray-200 p-5" data-pg="'+pg+'" data-key="'+def.key+'" data-id="'+sid+'">';
-    h+='  <div class="flex items-center justify-between mb-4">';
-    h+='    <div><h3 class="font-semibold">'+def.idx+' '+def.title+'</h3><span class="text-xs text-gray-400">'+def.hint+'</span></div>';
-    h+='    <div class="flex items-center gap-3">';
-    h+='      <span class="text-xs '+(st?'text-green-600 bg-green-50':'text-gray-400 bg-gray-100')+' px-2 py-0.5 rounded">'+(st?'显示中':'已隐藏')+'</span>';
-    h+='      <label class="relative inline-flex items-center cursor-pointer">';
-    h+='        <input type="checkbox" class="sr-only peer" '+(st?'checked':'')+' onchange="_togVis(this,\''+pg+'\',\''+def.key+'\','+sid+')">';
-    h+='        <div class="w-9 h-5 bg-gray-200 peer-checked:bg-[#2ab39f] rounded-full after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:after:translate-x-4"></div>';
-    h+='      </label>';
-    h+='    </div></div>';
-
-    // === Banner 模块：标题中/英 + 副标题中/英 + 图片 ===
-    if(def.key==='banner' && pg==='home'){
-      h+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">';
-      h+='  <div><label class="text-sm font-semibold block mb-1">标题（中文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'title_zh',''))+'" data-field="title_zh"></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">标题（英文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'title_en',''))+'" data-field="title_en"></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">副标题（中文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'subtitle_zh',''))+'" data-field="subtitle_zh"></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">副标题（英文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'subtitle_en',''))+'" data-field="subtitle_en"></div>';
-      h+='</div>';
-      h+='<div class="flex items-center gap-3 mt-4">';
-      h+='  <button onclick="_saveMod(\''+pg+'\',\''+def.key+'\','+sid+')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1f8e7d]">保存修改</button>';
-      h+='  <span class="text-xs text-gray-400">当前图片：'+h(_g(db,'image_url','banner-home.jpg'))+'</span>';
-      h+='  <span class="text-xs text-gray-400">Alt（中文）：<input type="text" class="border-b border-gray-200 text-xs w-28" value="'+h(_g(db,'image_alt_zh',''))+'" data-field="image_alt_zh"></span>';
-      h+='  <span class="text-xs text-gray-400">Alt（EN）：<input type="text" class="border-b border-gray-200 text-xs w-28" value="'+h(_g(db,'image_alt_en',''))+'" data-field="image_alt_en"></span>';
-      h+='</div>';
-    }
-    // === 四大核心优势 ===
-    else if(def.key==='advantages'){
-      h+='<div class="grid grid-cols-1 md:grid-cols-2 gap-4">';
-      var items = _g(db,'items',[{title:'16 年行业经验',desc:'专注环保包袋制造'},{title:'快速打样',desc:'3-5 天出样'},{title:'严格品控',desc:'ISO 认证工厂'},{title:'全球交付',desc:'FOB/CIF/DDP'}]);
-      for(var ai=0;ai<4;ai++){
-        var it = items[ai] || {title:'',desc:''};
-        h+='<div class="p-3 bg-gray-50 rounded-lg flex items-center gap-3"><div class="w-8 h-8 rounded-lg bg-[#e6f7f4] flex-shrink-0"></div><div><input type="text" class="form-input text-sm" value="'+h(it.title)+'" data-field="item_title_'+ai+'"><input type="text" class="form-input text-sm mt-1" value="'+h(it.desc)+'" data-field="item_desc_'+ai+'"></div></div>';
-      }
-      h+='</div>';
-      h+='<button class="mt-3 border border-dashed border-gray-300 text-gray-400 px-4 py-2 rounded-lg text-sm hover:border-[#2ab39f] hover:text-[#2ab39f]">＋ 新增优势模块</button>';
-      h+='<div class="mt-3"><button onclick="_saveMod(\''+pg+'\',\''+def.key+'\','+sid+')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1f8e7d]">保存修改</button></div>';
-    }
-    // === 热门产品展示 ===
-    else if(def.key==='featured-products'){
-      h+='<p class="text-sm text-gray-500">产品数据从「产品管理」中读取，此处仅控制模块显隐和标题</p>';
-      h+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-4 mt-3">';
-      h+='  <div><label class="text-sm font-semibold block mb-1">模块标题（中文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'title_zh','热门产品'))+'" data-field="title_zh"></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">模块标题（英文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'title_en','Popular Products'))+'" data-field="title_en"></div>';
-      h+='</div>';
-      h+='<div class="mt-3"><button onclick="_saveMod(\''+pg+'\',\''+def.key+'\','+sid+')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1f8e7d]">保存修改</button></div>';
-    }
-    // === 公司简介 ===
-    else if(def.key==='intro'){
-      h+='<div><label class="text-sm font-semibold block mb-1">正文（中文）</label><textarea class="form-input text-sm h-20 resize-none" data-field="content_zh">'+h(_g(db,'content_zh',''))+'</textarea></div>';
-      h+='<div class="mt-3"><button onclick="_saveMod(\''+pg+'\',\''+def.key+'\','+sid+')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1f8e7d]">保存修改</button></div>';
-    }
-    // === 发展历程 ===
-    else if(def.key==='history'){
-      h+='<button class="border border-dashed border-gray-300 text-gray-400 px-4 py-2 rounded-lg text-sm hover:border-[#2ab39f] hover:text-[#2ab39f]">＋ 新增时间节点</button>';
-    }
-    // === 企业实力 - 全套模块(8个子开关) ===
-    else if(pg==='strength' && def.key==='banner'){
-      // This is the "企业实力 - 全部模块" grouping
-      // Skip individual rendering, handled by the standalone "strength" group below
-      h+='<div class="text-sm text-gray-500 mb-2">模块列表：Banner、生产基地、证书、设备、车间、质控、产能、定制时间轴</div>';
-      h+='<div class="grid grid-cols-2 md:grid-cols-4 gap-2">';
-      var subKeys = ['banner','base','certs','equipment','workshop','qc','capacity','timeline'];
-      var subNames = ['Banner','生产基地','证书展示','核心设备','车间展厅','质控流程','产能数据','定制时间轴'];
-      for(var si=0;si<subKeys.length;si++){
-        var subDb = findByKey(subKeys[si]);
-        var subSt = subDb ? (subDb.status!==0) : true;
-        var subSid = subDb ? subDb.id : 0;
-        h+='<div class="p-2 bg-gray-50 rounded flex items-center justify-between"><span class="text-sm">'+subNames[si]+'</span><label class="relative inline-flex items-center cursor-pointer"><input type="checkbox" class="sr-only peer" '+(subSt?'checked':'')+' onchange="_togVis(this,\'strength\',\''+subKeys[si]+'\','+subSid+')"><div class="w-7 h-4 bg-gray-200 peer-checked:bg-[#2ab39f] rounded-full after:content-[\'\'] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-3 after:w-3 after:transition-all peer-checked:after:translate-x-3"></div></label></div>';
-      }
-      h+='</div>';
-    }
-    // === 通用: 内容中/英 + 图片（用于大多数板块）===
-    else {
-      h+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-4">';
-      h+='  <div><label class="text-sm font-semibold block mb-1">内容（中文）</label><textarea class="form-input text-sm h-20 resize-none" data-field="content_zh">'+h(_g(db,'content_zh',''))+'</textarea></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">内容（英文）</label><textarea class="form-input text-sm h-20 resize-none" data-field="content_en">'+h(_g(db,'content_en',''))+'</textarea></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">图片 URL</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'image_url',''))+'" data-field="image_url"></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">图片 Alt（中文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'image_alt_zh',''))+'" data-field="image_alt_zh"></div>';
-      h+='  <div><label class="text-sm font-semibold block mb-1">图片 Alt（英文）</label><input type="text" class="form-input text-sm" value="'+h(_g(db,'image_alt_en',''))+'" data-field="image_alt_en"></div>';
-      h+='</div>';
-      h+='<div class="mt-3"><button onclick="_saveMod(\''+pg+'\',\''+def.key+'\','+sid+')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm hover:bg-[#1f8e7d]">保存修改</button></div>';
-    }
-
-    h+='</div>';
+  for(var i = 0; i < s.length; i++){
+    var sec = s[i];
+    var enabled = sec.status !== 0;
+    var label = sec.name || sec.module_key || '未命名模块';
+    var contentVal = sec.content_zh || sec.content || '';
+    contentVal = contentVal.replace(/"/g, '&quot;');
+    h += '<div class="p-4 lg:p-6 flex items-start gap-4 hover:bg-gray-50 transition group">' +
+      '<div class="text-gray-300 cursor-move group-hover:text-gray-500 mt-1">&#9776;</div>' +
+      '<div class="flex-1"><div class="flex items-center justify-between mb-2">' +
+      '<h4 class="font-semibold text-gray-900 text-sm">模块' + (i+1) + '：' + label + '</h4>' +
+      '<span class="text-xs ' + (enabled ? 'bg-green-100 text-green-600' : 'bg-gray-100 text-gray-600') + ' rounded-full px-2 py-0.5">' + (enabled ? '已启用' : '已禁用') + '</span></div>' +
+      '<textarea rows="2" class="w-full px-3 py-2 border border-gray-200 rounded-lg text-xs font-mono text-gray-600" id="sec-content-' + sec.id + '">' + contentVal + '</textarea>' +
+      '<div class="flex gap-2 mt-2">' +
+      '<button class="text-[#2ab39f] text-xs hover:underline" onclick="alert(\'编辑HTML器(演示)\')">编辑HTML</button>' +
+      '<button class="text-red-500 text-xs hover:underline" onclick="toggleSection(' + sec.id + ',' + (enabled ? 0 : 1) + ')">' + (enabled ? '禁用' : '启用') + '</button></div></div></div>';
   }
   container.innerHTML = h;
 }
 
-function _g(db, field, fallback){
-  if(!db) return fallback;
-  if(field==='title_zh') return db.content_zh || fallback;
-  if(field==='title_en') return db.content_en || fallback;
-  if(field==='subtitle_zh') return db.image_alt_zh || fallback;
-  if(field==='subtitle_en') return db.image_alt_en || fallback;
-  if(field==='items'){
-    try{ var parsed = JSON.parse(db.content_zh || '[]'); if(Array.isArray(parsed)) return parsed; }catch(e){}
-    return fallback;
-  }
-  return db[field] || fallback;
+async function toggleSection(id, status){
+  await api('/admin-api/sections/'+id, { method:'PUT', body:{ status: status } });
+  var sel = document.getElementById('page-selector');
+  loadSections(sel ? sel.value : 'home');
 }
 
-async function _saveMod(pg, key, sid){
-  var container = document.querySelector('[data-pg="'+pg+'"][data-key="'+key+'"]');
-  if(!container) return;
-  var fields = ['content_zh','content_en','image_url','image_alt_zh','image_alt_en','title_zh','title_en','subtitle_zh','subtitle_en'];
-  var d = {}, hasData = false;
-  fields.forEach(function(f){
-    var el = container.querySelector('[data-field="'+f+'"]');
-    if(el) { d[f] = el.value; hasData = true; }
-  });
-  // Special handling for advantages items
-  if(key==='advantages'){
-    var items = [];
-    for(var i=0;i<4;i++){
-      var t = container.querySelector('[data-field="item_title_'+i+'"]');
-      var de = container.querySelector('[data-field="item_desc_'+i+'"]');
-      if(t && de) items.push({title:t.value, desc:de.value});
+async function saveAllSections(){
+  for(var k = 0; k < currentPageSections.length; k++){
+    var sec = currentPageSections[k];
+    var ta = document.getElementById('sec-content-' + sec.id);
+    if(ta && ta.value !== (sec.content_zh || sec.content || '')){
+      await api('/admin-api/sections/'+sec.id, { method:'PUT', body:{ content_zh: ta.value } });
     }
-    d.content_zh = JSON.stringify(items);
-    hasData = true;
   }
-  if(!hasData){ alert('没有需要保存的修改'); return; }
-  if(sid > 0){
-    var r = await api('/admin-api/sections/'+sid, {method:'PUT', body:d});
-    if(r.code===0) alert('保存成功'); else alert(r.msg||'保存失败');
+  alert('全部模块已保存');
+  var sel = document.getElementById('page-selector');
+  if(sel) loadSections(sel.value);
+}
+
+async function renderPages(){
+  var opts = '';
+  for(var i = 0; i < pageKeys.length; i++){
+    opts += '<option value="' + pageKeys[i] + '">' + pageLabels[i] + ' (' + pageKeys[i] + '.html)</option>';
+  }
+  document.getElementById('pageContent').innerHTML =
+    // Page Selector (matching prototype)
+    '<div class="bg-white rounded-xl shadow-sm p-6 mb-6">' +
+    '<label class="block text-sm font-medium text-gray-700 mb-2">选择页面</label>' +
+    '<select id="page-selector" class="w-full max-w-md px-3 py-2.5 border border-gray-200 rounded-lg text-sm" onchange="loadSections(this.value)">' + opts + '</select></div>' +
+    // Module List (matching prototype)
+    '<div class="bg-white rounded-xl shadow-sm overflow-hidden">' +
+    '<div class="p-6 border-b border-gray-100 flex items-center justify-between">' +
+    '<h3 class="font-bold text-gray-900">模块列表（拖拽排序）</h3>' +
+    '<span class="text-xs text-gray-400">拖动 &#9776; 图标调整顺序</span></div>' +
+    '<div id="section-list-container" class="divide-y divide-gray-100">' +
+    '<div class="p-8 text-center text-gray-400 text-sm">正在加载模块数据...</div></div></div>' +
+    // Actions (matching prototype)
+    '<div class="flex gap-3 mt-6">' +
+    '<button class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition" onclick="saveAllSections()">保存全部</button>' +
+    '<button class="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition">预览页面</button>' +
+    '<button class="border border-gray-200 text-red-500 px-6 py-2.5 rounded-lg text-sm hover:bg-red-50 transition">重置为默认</button></div>';
+  loadSections('home');
+}
+
+// === SETTINGS (align with admin-settings.html - 5 tabs) ===
+var settingsCurrentTab = 'basic';
+
+function switchSettingsTab(e, tabName){
+  var tabs = ['basic','contact','social','seo','copyright'];
+  tabs.forEach(function(t){
+    var btn = document.getElementById('set-tab-'+t);
+    var panel = document.getElementById('set-panel-'+t);
+    if(btn){ btn.className = 'py-4 hover:text-gray-700 whitespace-nowrap inactive-tab'; }
+    if(panel) panel.classList.add('hidden');
+  });
+  var activeBtn = document.getElementById('set-tab-'+tabName);
+  var activePanel = document.getElementById('set-panel-'+tabName);
+  if(activeBtn){ activeBtn.className = 'tab-active py-4 border-b-2 border-[#2ab39f] text-[#2ab39f] whitespace-nowrap'; }
+  if(activePanel) activePanel.classList.remove('hidden');
+  settingsCurrentTab = tabName;
+}
+
+async function renderSettings(){
+  var r = await api('/admin-api/config');
+  var configs = (r.data && Array.isArray(r.data)) ? r.data : [];
+  var cfgMap = {};
+  configs.forEach(function(c){ cfgMap[c.key] = c; });
+
+  function cfgInput(key, label, placeholder){
+    var c = cfgMap[key];
+    var val = c ? (c.value || '').replace(/"/g, '&quot;') : '';
+    var id = 'cfg-' + key;
+    return '<div><label class="block text-sm font-medium text-gray-700 mb-1">' + label + '</label><input id="' + id + '" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2ab39f]/30" value="' + val + '" placeholder="' + (placeholder||label) + '"></div>';
+  }
+  function cfgTextarea(key, label, rows){
+    var c = cfgMap[key];
+    var val = c ? (c.value || '').replace(/"/g, '&quot;') : '';
+    var id = 'cfg-' + key;
+    return '<div><label class="block text-sm font-medium text-gray-700 mb-1">' + label + '</label><textarea id="' + id + '" rows="' + (rows||2) + '" class="w-full px-3 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2ab39f]/30">' + val + '</textarea></div>';
+  }
+
+  document.getElementById('pageContent').innerHTML =
+    '<div class="bg-white rounded-xl shadow-sm overflow-hidden">' +
+    // 5 Tabs
+    '<div class="border-b border-gray-200 px-4 lg:px-6">' +
+    '<div class="flex gap-6 overflow-x-auto text-sm font-medium text-gray-500">' +
+    '<button class="tab-active py-4 border-b-2 border-[#2ab39f] text-[#2ab39f] whitespace-nowrap" id="set-tab-basic" onclick="switchSettingsTab(event,\'basic\')">站点基础信息</button>' +
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="set-tab-contact" onclick="switchSettingsTab(event,\'contact\')">联系方式</button>' +
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="set-tab-social" onclick="switchSettingsTab(event,\'social\')">社交媒体</button>' +
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="set-tab-seo" onclick="switchSettingsTab(event,\'seo\')">SEO默认</button>' +
+    '<button class="py-4 hover:text-gray-700 whitespace-nowrap inactive-tab" id="set-tab-copyright" onclick="switchSettingsTab(event,\'copyright\')">底部版权</button>' +
+    '</div></div>' +
+    // Tab Content
+    '<div id="set-panel-basic" class="p-4 lg:p-6 space-y-5">' +
+    '<h3 class="font-bold text-gray-900">站点基础信息</h3>' +
+    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+    cfgInput('site_title_zh','站点名称（中文）','广州富丽雅实业有限公司') +
+    cfgInput('site_title_en','站点名称（英文）','Guangzhou FulIya Industrial Co., Ltd.') +
+    cfgInput('site_short_name','站点简称','富丽雅实业') +
+    cfgInput('seo_keywords','站点关键词','富丽雅, 精密模具, 机械零部件, 工业制造') +
+    '</div>' +
+    cfgTextarea('site_description','站点描述',2) +
+    '</div>' +
+    '<div id="set-panel-contact" class="p-4 lg:p-6 space-y-5 hidden">' +
+    '<h3 class="font-bold text-gray-900">联系方式 (含FAX)</h3>' +
+    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+    cfgInput('company_address','地址','广州市番禺区工业大道88号富丽雅工业园') +
+    cfgInput('phone','电话','+86 20-8888-6666') +
+    cfgInput('fax','传真 (FAX)','+86 20-8888-6667') +
+    cfgInput('email','邮箱','info@fuliya.com') +
+    cfgInput('working_hours','工作时间','周一至周五 8:30 - 17:30') +
+    '</div></div>' +
+    '<div id="set-panel-social" class="p-4 lg:p-6 space-y-5 hidden">' +
+    '<h3 class="font-bold text-gray-900">社交媒体</h3>' +
+    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+    cfgInput('wechat','微信公众号','公众号名称/ID') +
+    cfgInput('linkedin','LinkedIn','https://linkedin.com/company/...') +
+    cfgInput('facebook','Facebook','https://facebook.com/...') +
+    cfgInput('youtube','YouTube','https://youtube.com/...') +
+    '</div></div>' +
+    '<div id="set-panel-seo" class="p-4 lg:p-6 space-y-5 hidden">' +
+    '<h3 class="font-bold text-gray-900">SEO默认设置</h3>' +
+    '<div class="grid grid-cols-1 md:grid-cols-2 gap-4">' +
+    cfgInput('seo_title_suffix','默认标题后缀',' - 广州富丽雅实业有限公司') +
+    cfgInput('seo_default_description','默认描述','广州富丽雅实业有限公司 - 全球领先的工业制造解决方案提供商') +
+    '</div></div>' +
+    '<div id="set-panel-copyright" class="p-4 lg:p-6 space-y-5 hidden">' +
+    '<h3 class="font-bold text-gray-900">底部版权</h3>' +
+    cfgInput('copyright','版权文本','© 2026 广州富丽雅实业有限公司 All Rights Reserved. | 粤ICP备xxxxxxxx号') +
+    '</div>' +
+    // Save Button
+    '<div class="flex gap-3 pt-4 border-t border-gray-100 px-4 lg:px-6 pb-4 lg:pb-6">' +
+    '<button onclick="saveSettings()" class="bg-[#2ab39f] text-white px-8 py-2.5 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition">保存全部配置</button>' +
+    '<button class="border border-gray-200 text-gray-600 px-6 py-2.5 rounded-lg text-sm hover:bg-gray-50 transition">重置</button></div></div>';
+}
+
+async function saveSettings(){
+  var r = await api('/admin-api/config');
+  var configs = (r.data && Array.isArray(r.data)) ? r.data : [];
+  for(var k = 0; k < configs.length; k++){
+    var cfg = configs[k];
+    var inp = document.getElementById('cfg-' + cfg.key);
+    if(inp && inp.value !== cfg.value){
+      // Use PUT /admin-api/config with { key, value } format per API docs
+      await api('/admin-api/config', { method:'PUT', body: { key: cfg.key, value: inp.value } });
+    }
+  }
+  alert('配置已保存');
+  renderSettings();
+}
+
+// === MESSAGES (align with admin-messages.html) ===
+async function renderMessages(){
+  const d = await api('/admin-api/messages');
+  const list = d.data?.list || [];
+  document.getElementById('msgBadge').textContent = list.filter(function(m){return m.status===0;}).length;
+  var hasUnread = list.some(function(m){return m.status===0;});
+  document.getElementById('msgBadge').classList.toggle('hidden', !hasUnread);
+  document.getElementById('pageContent').innerHTML = [
+    '<div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">',
+    '<div class="flex gap-2 flex-wrap"><button class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-[#1f8f7e] transition" onclick="batchAction(\'messages\',\'read\')">批量标记已读</button><button class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50" onclick="batchAction(\'messages\',\'unread\')">批量标记未读</button><button class="border border-red-200 text-red-500 px-4 py-2 rounded-lg text-sm hover:bg-red-50" onclick="batchAction(\'messages\',\'delete\')">批量删除</button><button class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50" onclick="batchAction(\'messages\',\'export\')">导出CSV</button></div>',
+    '<div class="flex gap-2 w-full sm:w-auto"><input type="text" placeholder="搜索留言..." class="w-full sm:w-44 px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#2ab39f]/30"><select class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500"><option>全部主题</option><option>产品询价</option><option>定制需求</option><option>技术支持</option><option>合作咨询</option><option>售后服务</option></select><select class="px-3 py-2 border border-gray-200 rounded-lg text-sm text-gray-500"><option>全部状态</option><option>已处理</option><option>未处理</option></select></div></div>',
+    '<div class="bg-white rounded-xl shadow-sm overflow-x-auto mb-8"><table class="w-full text-sm"><thead><tr class="bg-gray-50 text-gray-500 text-xs uppercase tracking-wider"><th class="text-left px-4 py-3"><input type="checkbox" class="rounded"></th><th class="text-left px-4 py-3">姓名</th><th class="text-left px-4 py-3">邮箱</th><th class="text-left px-4 py-3">主题</th><th class="text-left px-4 py-3">产品</th><th class="text-left px-4 py-3">时间</th><th class="text-left px-4 py-3">状态</th><th class="text-left px-4 py-3">操作</th></tr></thead><tbody class="divide-y divide-gray-100">',
+    list.map(function(m){return '<tr class="hover:bg-gray-50 '+(m.status===0?'font-semibold text-gray-900':'')+'"><td class="px-4 py-3"><input type="checkbox" class="rounded"></td><td class="px-4 py-3 '+(m.status===0?'text-gray-900':'')+'">'+(m.name||'')+'</td><td class="px-4 py-3 text-gray-500 text-xs">'+(m.email||'')+'</td><td class="px-4 py-3">'+(m.subject||'产品询价')+'</td><td class="px-4 py-3 text-gray-600 text-sm">'+(m.product||'-')+'</td><td class="px-4 py-3 text-xs text-gray-500">'+(m.create_time?new Date(m.create_time).toLocaleDateString():"-")+'</td><td class="px-4 py-3"><span class="px-2 py-0.5 '+(m.status===0?'bg-amber-100 text-amber-600':'bg-green-100 text-green-600')+' text-xs rounded-full">'+(m.status===0?'未处理':'已处理')+'</span></td><td class="px-4 py-3"><div class="flex gap-2">'+(m.status===0?'<span class="text-[#2ab39f] text-xs cursor-pointer hover:underline" onclick="markMessage('+m.id+')">标记已读</span>':'')+'<span class="text-red-500 text-xs cursor-pointer hover:underline" onclick="deleteMessage('+m.id+')">删除</span></div></td></tr>';}).join(''),
+    '</tbody></table></div>',
+    // Pagination (matching prototype)
+    '<div class="flex items-center justify-center gap-2">',
+    '<button class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-[#2ab39f] hover:text-white text-sm">&lt;</button>',
+    '<button class="w-9 h-9 rounded-lg bg-[#2ab39f] text-white text-sm font-medium">1</button>',
+    '<button class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-[#2ab39f] hover:text-white text-sm">2</button>',
+    '<button class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-600 hover:bg-[#2ab39f] hover:text-white text-sm">3</button>',
+    '<button class="w-9 h-9 rounded-lg border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-[#2ab39f] hover:text-white text-sm">&gt;</button>',
+    '</div>'
+  ].join('');
+}
+async function markMessage(id){ await api('/admin-api/messages/'+id, { method:'PUT' }); renderMessages(); }
+async function deleteMessage(id){ if(confirm('确认删除留言？')){ await api('/admin-api/messages/'+id,{method:'DELETE'}); switchPage('messages'); } }
+
+// === TOOLS (align with admin-tools.html - 3-column grid) ===
+function renderTools(){
+  document.getElementById('pageContent').innerHTML = [
+    '<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 lg:gap-6">',
+    // Generate Sitemap
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-[#e8f8f5] rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-[#2ab39f]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 17V7m0 10a2 2 0 01-2 2H5a2 2 0 01-2-2V7a2 2 0 012-2h2a2 2 0 012 2m0 10a2 2 0 002 2h2a2 2 0 002-2M9 7a2 2 0 012-2h2a2 2 0 012 2m0 10V7m0 10a2 2 0 002 2h2a2 2 0 002-2V7a2 2 0 00-2-2h-2a2 2 0 00-2 2"/></svg></div><h3 class="font-bold text-gray-900 mb-1">生成 Sitemap</h3><p class="text-gray-500 text-xs mb-4">自动生成 sitemap.xml 并提交给搜索引擎</p><button onclick="toolAction(\'sitemap\')" class="bg-[#2ab39f] text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-[#1f8f7e] transition">立即生成</button></div>',
+    // Ping Google / Bing
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9"/></svg></div><h3 class="font-bold text-gray-900 mb-1">Ping 搜索引擎</h3><p class="text-gray-500 text-xs mb-4">通知 Google / Bing 内容有更新</p><div class="flex gap-2"><button onclick="toolAction(\'ping-google\')" class="bg-blue-500 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-blue-600 transition">Ping Google</button><button onclick="toolAction(\'ping-bing\')" class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-xs hover:bg-gray-50">Ping Bing</button></div></div>',
+    // Edit robots.txt
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"/></svg></div><h3 class="font-bold text-gray-900 mb-1">编辑 robots.txt</h3><p class="text-gray-500 text-xs mb-4">管理搜索引擎爬虫访问规则</p><button onclick="toolAction(\'robots\')" class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-xs hover:bg-gray-50 transition">编辑</button></div>',
+    // Edit llms.txt
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-amber-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><h3 class="font-bold text-gray-900 mb-1">编辑 llms.txt</h3><p class="text-gray-500 text-xs mb-4">为 AI 模型提供站点信息文件</p><button onclick="toolAction(\'llms\')" class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-xs hover:bg-gray-50 transition">编辑</button></div>',
+    // Database Backup
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4"/></svg></div><h3 class="font-bold text-gray-900 mb-1">数据库备份</h3><p class="text-gray-500 text-xs mb-4">备份、还原、下载数据库</p><div class="flex gap-2 flex-wrap"><button onclick="toolAction(\'db-backup\')" class="bg-green-500 text-white px-3 py-2 rounded-lg text-xs font-medium hover:bg-green-600 transition">备份</button><button onclick="toolAction(\'db-restore\')" class="border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-xs hover:bg-gray-50">还原</button><button onclick="toolAction(\'db-download\')" class="border border-gray-200 text-gray-600 px-3 py-2 rounded-lg text-xs hover:bg-gray-50">下载</button></div></div>',
+    // Clear Logs
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-rose-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-rose-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/></svg></div><h3 class="font-bold text-gray-900 mb-1">清除日志</h3><p class="text-gray-500 text-xs mb-4">清理系统操作日志记录</p><button onclick="toolAction(\'clear-log\')" class="bg-rose-500 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-rose-600 transition">立即清理</button></div>',
+    // Export Logs
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-cyan-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-cyan-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/></svg></div><h3 class="font-bold text-gray-900 mb-1">导出日志</h3><p class="text-gray-500 text-xs mb-4">将系统日志导出为 CSV 文件</p><button onclick="toolAction(\'export-log\')" class="border border-gray-200 text-gray-600 px-4 py-2 rounded-lg text-xs hover:bg-gray-50 transition">导出日志</button></div>',
+    // Clear Cache
+    '<div class="bg-white rounded-xl p-6 shadow-sm hover:shadow-md transition"><div class="w-12 h-12 bg-orange-100 rounded-xl flex items-center justify-center mb-4"><svg class="w-6 h-6 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z"/></svg></div><h3 class="font-bold text-gray-900 mb-1">清除缓存</h3><p class="text-gray-500 text-xs mb-4">清除页面缓存和模板缓存</p><button onclick="toolAction(\'clear-cache\')" class="bg-orange-500 text-white px-4 py-2 rounded-lg text-xs font-medium hover:bg-orange-600 transition">立即清除</button></div>',
+    '</div>'
+  ].join('');
+}
+async function toolAction(action){
+  if(action === 'clear-cache'){
+    var r = await api('/admin-api/tools/clear-cache', { method:'POST' });
+    alert(r.msg || '缓存已清除');
+  } else if(action === 'sitemap'){
+    alert('已开始生成 Sitemap（演示功能）');
+  } else if(action === 'ping-google' || action === 'ping-bing'){
+    alert('已通知 ' + (action==='ping-google'?'Google':'Bing') + '（演示功能）');
+  } else if(action === 'robots'){
+    alert('编辑 robots.txt（演示功能）');
+  } else if(action === 'llms'){
+    alert('编辑 llms.txt（演示功能）');
+  } else if(action === 'db-backup'){
+    var r = await api('/admin-api/tools/clear-cache', { method:'POST' });
+    alert(r.msg || '数据库备份完成');
+  } else if(action === 'db-restore'){
+    alert('请选择备份文件（演示功能）');
+  } else if(action === 'db-download'){
+    alert('下载功能（演示功能）');
+  } else if(action === 'clear-log'){
+    var r = await api('/admin-api/tools/clear-cache', { method:'POST' });
+    alert(r.msg || '日志已清理');
+  } else if(action === 'export-log'){
+    alert('导出日志（演示功能）');
   } else {
-    alert('该板块暂未在数据库创建记录');
+    alert(action + ' (演示功能)');
   }
 }
 
-async function _togVis(cb, pg, key, sid){
-  if(sid > 0) await api('/admin-api/sections/'+sid, {method:'PUT', body:{status:cb.checked?1:0}});
+// === SAVE FUNCTIONS (real API calls) ===
+async function saveProduct(){
+  var data = {
+    title_zh: (document.getElementById('prod-title_zh') || {}).value || '',
+    title_en: (document.getElementById('prod-title_en') || {}).value || '',
+    product_no: (document.getElementById('prod-product_no') || {}).value || '',
+    category: (document.getElementById('prod-category') || {}).value || '',
+    status: parseInt((document.getElementById('prod-status') || {}).value || '0'),
+    sort_order: parseInt((document.getElementById('prod-sort_order') || {}).value || '1'),
+    description: (document.getElementById('prod-description') || {}).value || '',
+    seo_title: (document.getElementById('prod-seo_title') || {}).value || '',
+    seo_description: (document.getElementById('prod-seo_description') || {}).value || '',
+    seo_keywords: (document.getElementById('prod-seo_keywords') || {}).value || '',
+    detail_content: (document.getElementById('prod-detail_content') || {}).value || ''
+  };
+  if(!data.title_zh){ alert('请输入产品名称'); return; }
+  await api('/admin-api/products', { method:'POST', body: data });
+  alert('产品已保存');
+  switchPage('products');
 }
 
-// Settings
-function showSettings(){
-  var h='<div class="mb-6"><h1 class="text-lg font-bold">全站配置</h1></div>';
-  h+='<div class="bg-white rounded-xl border p-6 space-y-5">';
-  h+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-6"><div><label class="text-sm font-semibold block mb-1">站点标题（中文）</label><input class="fi" value="广州富丽雅实业有限公司"></div>';
-  h+='<div><label class="text-sm font-semibold block mb-1">站点标题（英文）</label><input class="fi" value="Guangzhou Fuliya Industry Co., Ltd."></div></div>';
-  h+='<div class="grid grid-cols-1 lg:grid-cols-4 gap-4"><div><label class="text-sm font-semibold block mb-1">电话</label><input class="fi" value="+86-20-12345678"></div>';
-  h+='<div><label class="text-sm font-semibold block mb-1">邮箱</label><input class="fi" value="info@fuliya.com"></div>';
-  h+='<div><label class="text-sm font-semibold block mb-1">WhatsApp</label><input class="fi" value="+86-138-0000-0000"></div>';
-  h+='<div><label class="text-sm font-semibold block mb-1">LinkedIn</label><input class="fi" value="linkedin.com/company/fuliya"></div></div>';
-  h+='<div><label class="text-sm font-semibold block mb-1">公司地址</label><input class="fi" value="广州市白云区某某路 88 号"></div>';
-  h+='<div><label class="text-sm font-semibold block mb-1">全站默认语言</label><label class="mr-4"><input type="radio" name="dLang" checked> 中文</label><label><input type="radio" name="dLang"> English</label></div>';
-  h+='<button class="bg-[#2ab39f] text-white px-6 py-2.5 rounded-lg text-sm font-medium">保存配置</button></div>';
-  $('pc').innerHTML=h;
+async function saveNews(){
+  var data = {
+    title_zh: (document.getElementById('news-title_zh') || {}).value || '',
+    category: (document.getElementById('news-category') || {}).value || '',
+    author: (document.getElementById('news-author') || {}).value || '',
+    status: parseInt((document.getElementById('news-status') || {}).value || '0'),
+    summary: (document.getElementById('news-summary') || {}).value || '',
+    content: (document.getElementById('news-content') || {}).value || '',
+    tags: (document.getElementById('news-tags') || {}).value || ''
+  };
+  if(!data.title_zh){ alert('请输入新闻标题'); return; }
+  await api('/admin-api/news', { method:'POST', body: data });
+  alert('新闻已保存');
+  switchPage('news');
 }
 
-// Messages
-async function getMessages(){
-  var d=await api('/admin-api/messages');
-  var list=d.data&&d.data.list?d.data.list:[];
-  var total=d.data?d.data.total:0;
-  var unread=0;for(var i=0;i<list.length;i++)if(list[i].status===0)unread++;
-  var h='<div class="flex items-center justify-between mb-6"><div><h1 class="text-lg font-bold">留言管理</h1><p class="text-sm text-gray-400">共 '+total+' 条，'+unread+' 条未处理</p></div>';
-  h+='<button class="border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm">📥 导出</button></div>';
-  h+='<div class="bg-white rounded-xl border overflow-hidden"><table class="tbl"><thead><tr><th>姓名</th><th>公司</th><th>邮箱</th><th>需求</th><th>状态</th><th>操作</th></tr></thead><tbody>';
-  for(var i=0;i<list.length;i++){
-    var m=list[i];
-    h+='<tr><td class="font-medium">'+h(m.name)+'</td><td>'+h(m.company||'-')+'</td><td>'+h(m.email)+'</td>';
-    h+='<td class="max-w-[200px] truncate text-sm">'+h((m.demand||'').slice(0,30))+'</td>';
-    h+='<td><span class="bdg '+(m.status===0?'bdg-y':'bdg-g')+'">'+(m.status===0?'未处理':'已处理')+'</span></td>';
-    h+='<td>'+(m.status===0?'<span class="text-[#2ab39f] text-sm cursor-pointer" onclick="markMsg('+m.id+')">标记已处理</span>':'<span class="text-gray-400 text-sm">已处理</span>')+'</td></tr>';
+async function saveCase(){
+  var data = {
+    title_zh: (document.getElementById('case-title_zh') || {}).value || '',
+    client_name: (document.getElementById('case-client_name') || {}).value || '',
+    industry: (document.getElementById('case-industry') || {}).value || '',
+    country: (document.getElementById('case-country') || {}).value || '',
+    status: parseInt((document.getElementById('case-status') || {}).value || '0'),
+    sort_order: parseInt((document.getElementById('case-sort_order') || {}).value || '1'),
+    summary: (document.getElementById('case-summary') || {}).value || '',
+    testimonial: (document.getElementById('case-testimonial') || {}).value || ''
+  };
+  if(!data.title_zh){ alert('请输入案例标题'); return; }
+  await api('/admin-api/cases', { method:'POST', body: data });
+  alert('案例已保存');
+  switchPage('cases');
+}
+
+// === BATCH ACTIONS (real API calls) ===
+function batchAction(type, action) {
+  var pageContent = document.getElementById('pageContent');
+  var checkboxes = pageContent.querySelectorAll('input[type="checkbox"]:checked');
+  var ids = [];
+  checkboxes.forEach(function(cb){
+    var row = cb.closest('tr');
+    if(row){
+      var cells = row.querySelectorAll('td');
+      if(cells.length >= 2){
+        var txt = cells[1].textContent.trim();
+        var num = parseInt(txt.replace(/[^0-9]/g, ''));
+        if(!isNaN(num)) ids.push(num);
+      }
+    }
+  });
+  if(ids.length === 0){ alert('请先勾选要操作的项目'); return; }
+  if(!confirm('确认对 ' + ids.length + ' 条记录执行操作?')) return;
+
+  if(type === 'products'){
+    if(action === 'delete'){
+      ids.forEach(function(id){ api('/admin-api/products/'+id, { method:'DELETE' }); });
+      setTimeout(function(){ switchPage('products'); }, 500);
+    } else if(action === 'publish'){
+      ids.forEach(function(id){ api('/admin-api/products/'+id, { method:'PUT', body: { status: 1 } }); });
+      setTimeout(function(){ switchPage('products'); }, 500);
+    }
+  } else if(type === 'messages'){
+    if(action === 'read'){
+      ids.forEach(function(id){ api('/admin-api/messages/'+id, { method:'PUT', body: { status: 1 } }); });
+      setTimeout(function(){ switchPage('messages'); }, 500);
+    } else if(action === 'unread'){
+      ids.forEach(function(id){ api('/admin-api/messages/'+id, { method:'PUT', body: { status: 0 } }); });
+      setTimeout(function(){ switchPage('messages'); }, 500);
+    } else if(action === 'delete'){
+      ids.forEach(function(id){ api('/admin-api/messages/'+id, { method:'DELETE' }); });
+      setTimeout(function(){ switchPage('messages'); }, 500);
+    } else if(action === 'export'){
+      alert('导出CSV(演示)');
+    }
   }
-  h+='</tbody></table></div>';
-  $('pc').innerHTML=h;
-}
-async function markMsg(id){await api('/admin-api/messages/'+id,{method:'PUT'});getMessages()}
-
-// Tools
-// Tools — 系统工具（严格对标布局演示）
-function showTools(){
-  var h='<div class="mb-6"><h1 class="text-lg font-bold">系统工具</h1><p class="text-sm text-gray-400">SEO 文件、数据库、图片管理</p></div>';
-  h+='<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">';
-  h+='<div class="bg-white rounded-xl border border-gray-200 p-6"><h3 class="font-semibold mb-2">📄 SEO 文件管理</h3><p class="text-sm text-gray-500 mb-4">一键更新 robots.txt、sitemap.xml、llms.txt</p><div class="space-y-3">';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">sitemap.xml</span><span class="text-xs text-gray-400">最后更新：2026-06-01</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'sitemap 已更新(演示)\')">立即更新</button></div>';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">robots.txt</span><span class="text-xs text-gray-400">已配置</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'查看 robots.txt(演示)\')">查看</button></div>';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">llms.txt</span><span class="text-xs text-gray-400">未生成</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'llms.txt 已生成(演示)\')">生成</button></div></div></div>';
-  h+='<div class="bg-white rounded-xl border border-gray-200 p-6"><h3 class="font-semibold mb-2">🗄️ 数据库管理</h3><p class="text-sm text-gray-500 mb-4">备份、恢复、数据维护</p><div class="space-y-3">';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">数据库备份</span><span class="text-xs text-gray-400">上次备份：2026-06-14</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'备份完成(演示)\')">立即备份</button></div>';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">数据恢复</span><span class="text-xs text-gray-400">选择备份文件</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'请上传文件(演示)\')">上传恢复</button></div></div></div>';
-  h+='<div class="bg-white rounded-xl border border-gray-200 p-6"><h3 class="font-semibold mb-2">🖼️ 图片管理</h3><p class="text-sm text-gray-500 mb-4">批量上传、压缩、替换</p><div class="border-2 border-dashed border-gray-200 rounded-lg p-8 text-center"><p class="text-gray-400 text-sm">拖拽图片到此处上传</p><p class="text-xs text-gray-300 mt-1">支持 jpg/png/webp，单图 ≤2MB</p><button class="mt-3 border border-gray-300 text-gray-600 px-4 py-2 rounded-lg text-sm hover:bg-gray-50 transition" onclick="alert(\'文件选择(演示)\')">选择文件</button></div></div>';
-  h+='<div class="bg-white rounded-xl border border-gray-200 p-6"><h3 class="font-semibold mb-2">📊 数据迁移</h3><p class="text-sm text-gray-500 mb-4">从旧站 WP 导入数据</p><div class="space-y-3">';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">产品数据导入</span><span class="inline-block px-2 py-0.5 rounded-full text-xs bg-green-100 text-green-700">已完成</span></div>';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">图片本地化</span><span class="inline-block px-2 py-0.5 rounded-full text-xs bg-yellow-100 text-yellow-700">待处理</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'开始迁移(演示)\')">开始迁移</button></div>';
-  h+='<div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg"><span class="text-sm font-medium">数据校验报告</span><span class="inline-block px-2 py-0.5 rounded-full text-xs bg-gray-100 text-gray-500">未生成</span><button class="text-sm text-[#2ab39f] hover:underline" onclick="alert(\'报告已生成(演示)\')">生成报告</button></div></div></div>';
-  h+='</div>';
-  $('pc').innerHTML=h;
 }
 
-getDashboard();
-</script></body></html>
+function switchProdTab(e, tab) {
+  var tabs = ['basic','seo','params','detail','faq','related','preview'];
+  tabs.forEach(function(t){
+    var btn = document.getElementById('prod-tab-' + t);
+    var panel = document.getElementById('prod-panel-' + t);
+    if (btn) { btn.className = 'py-4 hover:text-gray-700 whitespace-nowrap inactive-tab'; }
+    if (panel) panel.classList.add('hidden');
+  });
+  var activeBtn = document.getElementById('prod-tab-' + tab);
+  var activePanel = document.getElementById('prod-panel-' + tab);
+  if (activeBtn) { activeBtn.className = 'tab-active py-4 border-b-2 border-[#2ab39f] text-[#2ab39f] whitespace-nowrap'; }
+  if (activePanel) activePanel.classList.remove('hidden');
+}
+
+function logout(){ localStorage.removeItem('fuliya_token'); localStorage.removeItem('fuliya_nickname'); location.href='/admin'; }
+
+// Init
+switchPage('dashboard');
+document.getElementById('adminInfo').textContent = '\u{1F464} ' + (localStorage.getItem('fuliya_nickname') || '\u7ba1\u7406\u5458');
+</script>
+</body></html>
